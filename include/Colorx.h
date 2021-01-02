@@ -22,7 +22,7 @@ public:
 
     void init();
 
-    /* jugdge if GLFWwindow active */
+    /* judge if GLFWwindow active */
     bool run();
 };
 
