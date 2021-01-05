@@ -25,7 +25,7 @@ include_directories(opengl_helper/glad/include)
 #config glm
 include_directories(opengl_helper/glm)
 
-set(SOURCE_FILES main.cpp ${GLAD_SRC} ${COLORX_LIB_CPP})
+set(SOURCE_FILES main.cpp ${GLAD_SRC})
 add_executable(colorx ${SOURCE_FILES})
 target_link_libraries(colorx ${LIBS})
 
