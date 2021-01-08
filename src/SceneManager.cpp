@@ -2,9 +2,9 @@
  * Function:
  * Camera / Light / Mesh is all in here
  */
-#ifndef PI
-#define PI 3.14159265358979323846f
-#endif
+
+
+
 
 #include "../include/SceneManager.h"
 
@@ -19,7 +19,7 @@ inline SceneNode::SceneNode(TYPE Type):
 	type			= Type;
 }
 
-inline SceneNode::SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, TYPE Type)
+inline SceneNode::SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, TYPE Type, int id)
 {
 	pos				= Pos;
 	rotAngle		= RotAngle;
@@ -220,76 +220,77 @@ void SceneManager::drawAll(Shader &shader)
  *	One requires no transformation parameters in input.
  *	The other one requires them.
  */
-void SceneManager::addCubeNode(SceneManager *smgr, int id = 0)
+void SceneManager::addCubeNode(SceneManager *smgr, int id)
 {
-	SceneNode::SceneNode Node(_CUBE_);
+	
+	SceneNode* Node = new SceneNode(_CUBE_);
 
-	this->commonNodes.push_back(Node);
+	this->commonNodes.push_back(*Node);
 
-	delete &Node;
+	delete Node;
 }
 
-void SceneManager::addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id = 0)
+void SceneManager::addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
 {
-	SceneNode::SceneNode Node(Pos, RotAngle, RotAxis, Scale, _CUBE_);
+	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, _CUBE_);
 
-	this->commonNodes.push_back(Node);
+	this->commonNodes.push_back(*Node);
 
-	delete &Node;
+	delete Node;
 }
 
-void SceneManager::addSphereNode(SceneManager *smgr, int id = 0)
+void SceneManager::addSphereNode(SceneManager *smgr, int id)
 {
-	SceneNode::SceneNode Node(_SPHERE_);
+	SceneNode* Node = new SceneNode(_SPHERE_);
 
-	this->commonNodes.push_back(Node);
+	this->commonNodes.push_back(*Node);
 
-	delete &Node;
+	delete Node;
 }
 
-void SceneManager::addSphereNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id = 0)
+void SceneManager::addSphereNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
 {
-	SceneNode::SceneNode Node(Pos, RotAngle, RotAxis, Scale, _SPHERE_);
+	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, _SPHERE_);
 
-	this->commonNodes.push_back(Node);
+	this->commonNodes.push_back(*Node);
 
-	delete &Node;
+	delete Node;
 }
 
-void SceneManager::addCylinderNode(SceneManager *smgr, int id = 0)
+void SceneManager::addCylinderNode(SceneManager *smgr, int id)
 {
-	SceneNode::SceneNode Node(_CYLINDER_);
+	SceneNode* Node = new SceneNode(_CYLINDER_);
 
-	this->commonNodes.push_back(Node);
+	this->commonNodes.push_back(*Node);
 
-	delete &Node;
+	delete Node;
 }
 
-void SceneManager::addCylinderNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id = 0)
+void SceneManager::addCylinderNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
 {
-	SceneNode::SceneNode Node(Pos, RotAngle, RotAxis, Scale, _CYLINDER_);
+	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, _CYLINDER_);
 
-	this->commonNodes.push_back(Node);
+	this->commonNodes.push_back(*Node);
 
-	delete &Node;
+	delete Node;
 }
 
-void SceneManager::addConeNode(SceneManager *smgr, int id = 0)
+void SceneManager::addConeNode(SceneManager *smgr, int id)
 {
-	SceneNode::SceneNode Node(_CONE_);
+	SceneNode* Node = new SceneNode(_CONE_);
 
-	this->commonNodes.push_back(Node);
+	this->commonNodes.push_back(*Node);
 
-	delete &Node;
+	delete Node;
 }
 
-void SceneManager::addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id = 0)
+void SceneManager::addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
 {
-	SceneNode::SceneNode Node(Pos, RotAngle, RotAxis, Scale, _CONE_);
+	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, _CONE_);
 
-	this->commonNodes.push_back(Node);
+	this->commonNodes.push_back(*Node);
 
-	delete &Node;
+	delete Node;
 }
 
 Camera* SceneManager::addFpsCameraNode(SceneManager *smgr)

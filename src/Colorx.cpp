@@ -42,7 +42,7 @@ Colorx::Colorx()
     }
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    stbi_set_flip_vertically_on_load(true);
+    //stbi_set_flip_vertically_on_load(true);
 
     return;
 }
@@ -51,11 +51,11 @@ void Colorx::initScene()
 {
     smgr->addConeNode(smgr,glm::vec3(1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
     smgr->addConeNode(smgr,glm::vec3(-1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
-    //
+
 }
 
 void Colorx::run()
-{
+{   
     while(!glfwWindowShouldClose(window)){
         float currentFrame = glfwGetTime();
         eventer->deltaTime = currentFrame - eventer->lastFrame;

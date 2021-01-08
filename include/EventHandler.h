@@ -1,11 +1,22 @@
+#pragma once
 #ifndef EVENT_HANDLER_H
 #define EVENT_HANDLER_H
 
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <SceneManager.h>
-#include <Camera.h>
-#include <core.h>
+#include "SceneManager.h"
+
+extern bool firstMouse;
+extern float lastX;
+extern float lastY;
+
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+void processInput(GLFWwindow* window);
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 class EventHandler
 {
@@ -15,6 +26,7 @@ public:
     float deltaTime;	// time between current frame and last frame
     float lastFrame;
 
+    
     inline EventHandler(SceneManager* sengr){
         smgr = sengr;
         deltaTime = 0.0f;
@@ -25,13 +37,5 @@ public:
         glfwSetFramebufferSizeCallback(smgr->window,framebuffer_size_callback);
     }
 };
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
-void processInput(GLFWwindow* window);
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 #endif

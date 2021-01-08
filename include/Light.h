@@ -11,7 +11,8 @@
 #define LIGHT_H
 
 #include <glm/glm.hpp>
-#include "EventHandler.h"
+#include "Shader.h"
+#include <GLFW/glfw3.h>
 
 class Light
 { 
@@ -56,8 +57,6 @@ public:
     void drawLight(Shader* lightShader);
 
 private:
-    
-    SceneManager* smgr;
     GLFWwindow* window;
 };
 

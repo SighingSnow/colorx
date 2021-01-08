@@ -1,5 +1,9 @@
 #include "../include/EventHandler.h"
 
+bool firstMouse = false;
+float lastX = SCR_WIDTH / 2;
+float lastY = SCR_HEIGHT / 2;
+
 void processInput(GLFWwindow *window)
 {
      void* data = glfwGetWindowUserPointer(window);
