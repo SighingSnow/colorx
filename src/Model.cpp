@@ -1,6 +1,4 @@
-#include "Model.h"
-
-
+#include "../include/Model.h"
 
 //render the model
 void Model::Draw(Shader &shader)

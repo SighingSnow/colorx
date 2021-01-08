@@ -8,22 +8,30 @@
 
 #include <glfw/glfw3.h>
 #include "SceneManager.h"
+#include "EventHandler.h"
+#include "Core.h"
+#include "Camera.h"
+
+extern bool firstMouse;
+extern float lastX;
+extern float lastY;
 
 class Colorx
 { 
 public:
     GLFWwindow* window;
     SceneManager* smgr;
+    EventHandler* eventer;
+    Shader* shader;
 
-    inline Colorx(){
-        window = nullptr;
-        smgr = nullptr;
-    }
+    Colorx();
 
-    void init();
+    void initScene();
 
     /* judge if GLFWwindow active */
-    bool run();
+    void run();
+
+    ~Colorx();
 };
 
 #endif

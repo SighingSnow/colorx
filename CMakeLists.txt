@@ -3,9 +3,6 @@ project(colorx)
 
 set(CMAKE_CXX_STANDARD 11)
 
-#config our engine
-include_directories(include)
-aux_source_directory(include COLORX_LIB_CPP)
 
 #config glfw
 option(GLFW_BUILD_DOCS OFF)
@@ -25,7 +22,12 @@ include_directories(opengl_helper/glad/include)
 #config glm
 include_directories(opengl_helper/glm)
 
-set(SOURCE_FILES main.cpp ${GLAD_SRC})
+#config our engine
+include_directories(include)
+include_directories(src)
+set(ENGINE_SRC src)
+
+set(SOURCE_FILES main.cpp ${GLAD_SRC} ${ENGINE_SRC})
 add_executable(colorx ${SOURCE_FILES})
 target_link_libraries(colorx ${LIBS})
 

@@ -13,10 +13,11 @@
 #include <glm/glm.hpp>
 #include "EventHandler.h"
 
-class Light : public EventHandler
+class Light
 { 
 public:
     glm::vec3 position;
+    Shader* lightShader;
 
     float constant;
     float linear;
@@ -54,18 +55,8 @@ public:
     
     void drawLight(Shader* lightShader);
 
-    /* adjust the shiness and pos */
-    /* use mouse_button_callback and keyboard_call_back */
-    void OnEvent();
-
-    /* GLFW provides glfwGetMousePos and many useful API for you to use */
-    /* tutorial may is here https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button */
-    void mouse_button_callback(GLFWwindow* window,int button, int action, int mods);
-
-    void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
 private:
-    Shader* lightShader;
+    
     SceneManager* smgr;
     GLFWwindow* window;
 };

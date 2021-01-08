@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <glfw/glfw3.h>
+#include "../Shader"
 #include "Light.h"
 #include "Camera.h"
 #include "Model.h"
@@ -24,9 +25,8 @@ enum _TYPE_
 	_FRUSTUM_
 };
 
-typedef enum _TYPE_ TYPE
+typedef enum _TYPE_ TYPE;
 
-#include "SceneManager.cpp"
 
 namespace scene
 {
@@ -59,8 +59,16 @@ public:
 class SceneManager
 {
 public:
+	GLFWwindow *window;
+	Camera* camera;
+	Shader* commonShader;
+	Shader* lightShader;
+	bool collideMode;
+	bool constructNode;
+	bool destructNode;
 	std::vector<Model> meshNodes;
 	std::vector<Light> lights;
+	std::vector<Model> meshNodes;
 
 	//Each node uses a set of VBO, VAO and EBO(if need)
 	unsigned int VBO[7];
@@ -101,13 +109,15 @@ public:
 	/* auto save to current dir */
 	void prtScreen();
 
-	SceneManager();
+	inline SceneManager(GLFWwindow* mywindow){
+		window = mywindow;
+		commonShader = mshader;
+	};
+
 	~SceneManager();
 
 private:
 	std::vector<SceneNode> commonNodes;
-
-	GLFWwindow *window;
 
 	/* The following arrays and functions generate those standard polygons' coordinates we need */
 

@@ -6,7 +6,7 @@
 #define PI 3.14159265358979323846f
 #endif
 
-#include "SceneManager.h"
+#include "../include/SceneManager.h"
 
 /*	Class SceneNode's constructor and draw(Shader &shader) function
  */
