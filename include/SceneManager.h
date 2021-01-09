@@ -65,6 +65,7 @@ public:
 	Camera* camera;
 	Shader* commonShader;
 	Shader* lightShader;
+	Shader* meshShader;
 	bool collideMode;
 	bool constructNode;
 	bool destructNode;
@@ -74,10 +75,11 @@ public:
 
 	inline SceneManager(GLFWwindow* mywindow){
 		window = mywindow;
-		commonShader = new Shader();
-		camera = new Camera();
+		commonShader = new Shader(ordinary_type);
+		meshShader = new Shader(mesh_type);
+		lightShader = new Shader(light_type);
+		camera = new Camera(glm::vec3(0.0f,0.0f,3.0f));
 	};
-
 
 	//Each node uses a set of VBO, VAO and EBO(if need)
 	unsigned int VBO[7];
@@ -87,7 +89,7 @@ public:
 	void setupSMGR();			//Used before the render loop to bind VBO, VAO and EBOs(if need)
 	void deleteSMGR();			//Used at the end to delete those buffers
 
-	void addMeshSceneNode(SceneManager *smgr, int id);
+	void addMeshSceneNode(SceneManager *smgr, const char* path ,int id);
 
 	void addCubeNode(SceneManager *smgr, int id);
 	void addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id);
@@ -110,7 +112,7 @@ public:
 	Light *addFocusLightNode(SceneManager *smgr, int id);
 
 	/* draw all the meshNodes and Nodes */
-	void drawAll(Shader &shader);
+	void drawAll();
 
 	/* auto save to current dir */
 	void prtScreen();

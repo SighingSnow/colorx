@@ -38,16 +38,16 @@ Colorx::Colorx()
     eventer = new EventHandler(smgr);
 
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-   
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     return;
 }
 
 void Colorx::initScene()
 {
-    smgr->addCubeNode(smgr,glm::vec3(1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
+    smgr->addCubeNode(smgr,glm::vec3(0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
+    //smgr->addMeshSceneNode(smgr,"resourse/nanosuit",unPickable);
+    
     // smgr->addConeNode(smgr,glm::vec3(1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
     // smgr->addConeNode(smgr,glm::vec3(-1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
 }
@@ -57,21 +57,31 @@ void Colorx::run()
     while(!glfwWindowShouldClose(window)){
         float currentFrame = glfwGetTime();
         eventer->deltaTime = currentFrame - eventer->lastFrame;
+        eventer->lastFrame = currentFrame;
         processInput(window);
         
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         smgr->commonShader->use();
-        glm::mat4 projection = glm::perspective(glm::radians(smgr->camera->Zoom),SCR_WIDTH/SCR_HEIGHT,0.1f,100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(smgr->camera->Zoom),(float)SCR_WIDTH/SCR_HEIGHT,0.1f,100.0f);
         glm::mat4 view = smgr->camera->GetViewMatrix();
         smgr->commonShader->setMat4("projection",projection);
         smgr->commonShader->setMat4("view",view);
 
-        smgr->drawAll(*(smgr->commonShader));
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        smgr->commonShader->setMat4("model", model);
+    
+
+        smgr->drawAll();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    glfwTerminate();
+    return;
 }
 
 Colorx::~Colorx(){

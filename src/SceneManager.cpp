@@ -17,6 +17,13 @@ inline SceneNode::SceneNode(TYPE Type):
 	type			= Type;
 }
 
+/* This is just a test */
+void SceneManager::addMeshSceneNode(SceneManager *smgr, const char* path ,int id)
+{
+	Model ourModel("./resource/nanosuit/nanosuit.obj");
+	meshNodes.push_back(ourModel);
+}
+
 inline SceneNode::SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, TYPE Type, int id)
 {
 	pos				= Pos;
@@ -203,12 +210,15 @@ void SceneManager::deleteSMGR()
 }
 
 //	Traversal every nodes in our SceneManager and draw them.
-void SceneManager::drawAll(Shader &shader)
+void SceneManager::drawAll()
 {
 	for (unsigned int i = 0; i < this->commonNodes.size(); i++)
 	{
 		glBindVertexArray(this->VAO[this->commonNodes[i].type]);
-		this->commonNodes[i].draw(shader);
+		this->commonNodes[i].draw(*(this->commonShader));
+	}
+	for(unsigned int i = 0;i < this->meshNodes.size();i++){
+		this->meshNodes[i].Draw(*(this->meshShader));
 	}
 }
 

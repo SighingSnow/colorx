@@ -8,30 +8,42 @@
 #include <iostream>
 #include "Core.h"
 #include <glad/glad.h>
+
 class Shader
 {
 public:
     unsigned int ID;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader()
+    Shader(int stype)
     {
-        
         unsigned int vertex, fragment;
         int success;
         char infoLog[512];
         
         vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &nodeVShader, NULL);
-        glCompileShader(vertex);
-        
-        glGetShaderiv(vertex,GL_COMPILE_STATUS,&success);
-        if(!success){
-            glGetShaderInfoLog(vertex,512,NULL,infoLog);
-        }
-        
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &nodeFShader, NULL);
+        switch(stype){
+            case ordinary_type:
+            {
+                glShaderSource(vertex, 1, &nodeVShader, NULL);
+                glShaderSource(fragment, 1, &nodeFShader, NULL);
+            }
+            case mesh_type:
+            {
+                glShaderSource(vertex, 1, &meshNodeVShader, NULL);
+                glShaderSource(fragment, 1, &meshNodeFShader, NULL);
+            }
+            case light_type:
+            {
+                glShaderSource(vertex, 1, &lightVShader, NULL);
+                glShaderSource(fragment, 1, &lightFShader, NULL);
+            }
+        }
+
+        glCompileShader(vertex);
+        checkCompileErrors(vertex,"VERTEX");
+
         glCompileShader(fragment);
         checkCompileErrors(fragment, "FRAGMENT");
         
