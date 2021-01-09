@@ -54,7 +54,7 @@ public:
 	void draw(Shader &shader);
 
 	~SceneNode(){
-		delete this;
+		//delete this;
 	};
 };
 
@@ -71,6 +71,13 @@ public:
 	std::vector<Model> meshNodes;
 	std::vector<Light> lights;
 	std::vector<SceneNode> sceneNodes;
+
+	inline SceneManager(GLFWwindow* mywindow){
+		window = mywindow;
+		commonShader = new Shader();
+		camera = new Camera();
+	};
+
 
 	//Each node uses a set of VBO, VAO and EBO(if need)
 	unsigned int VBO[7];
@@ -102,19 +109,11 @@ public:
 
 	Light *addFocusLightNode(SceneManager *smgr, int id);
 
-	Camera *addFpsCameraNode(SceneManager *smgr);
-	Camera *addFpsCameraNode(SceneManager *smgr, glm::vec3 Pos, glm::vec3 Up);
-
 	/* draw all the meshNodes and Nodes */
 	void drawAll(Shader &shader);
 
 	/* auto save to current dir */
 	void prtScreen();
-
-	inline SceneManager(GLFWwindow* mywindow){
-		window = mywindow;
-		commonShader = new Shader();
-	};
 
 	~SceneManager();
 

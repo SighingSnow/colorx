@@ -16,13 +16,13 @@ public:
     // ------------------------------------------------------------------------
     Shader()
     {
+        
         unsigned int vertex, fragment;
         int success;
         char infoLog[512];
+        
         vertex = glCreateShader(GL_VERTEX_SHADER);
-        std::cout<<"tmd"<<std::endl;
         glShaderSource(vertex, 1, &nodeVShader, NULL);
-         std::cout<<"tmd"<<std::endl;
         glCompileShader(vertex);
         
         glGetShaderiv(vertex,GL_COMPILE_STATUS,&success);
@@ -34,8 +34,6 @@ public:
         glShaderSource(fragment, 1, &nodeFShader, NULL);
         glCompileShader(fragment);
         checkCompileErrors(fragment, "FRAGMENT");
-
-        std::cout<<"Hello world1"<<std::endl;
         
         // shader Program
         ID = glCreateProgram();
@@ -46,8 +44,6 @@ public:
         // delete the shaders as they're linked into our program now and no longer necessery
         glDeleteShader(vertex);
         glDeleteShader(fragment);
-
-        std::cout<<"Hello world2"<<std::endl;
     }
     // activate the shader
     // ------------------------------------------------------------------------

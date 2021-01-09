@@ -291,20 +291,6 @@ void SceneManager::addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle
 	delete Node;
 }
 
-Camera* SceneManager::addFpsCameraNode(SceneManager *smgr)
-{
-	Camera Cam;
-
-	return &Cam;
-}
-
-Camera* SceneManager::addFpsCameraNode(SceneManager *smgr, glm::vec3 Pos, glm::vec3 Up)
-{
-	Camera Cam(Pos, Up);
-
-	return &Cam;
-}
-
 /*	The following functions are in the private area of class SceneManager.
  *	They are used once in the public function setSMGR() to build the vectors 
  *	which save the coordinates of the standard geometry polyhedra.

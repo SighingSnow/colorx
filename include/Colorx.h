@@ -14,8 +14,6 @@ public:
     GLFWwindow* window;
     SceneManager* smgr;
     EventHandler* eventer;
-    Shader* shader;
-
     Colorx();
 
     void initScene();

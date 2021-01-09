@@ -16,7 +16,7 @@ Colorx::Colorx()
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
 
-    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Colorx", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -25,7 +25,13 @@ Colorx::Colorx()
     }
     glfwMakeContextCurrent(window);
     
-    
+     /* configure glad */
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        exit(0);
+    }
+
     /* pass the window and auto set light and camera */
     smgr = new SceneManager(window);
     /* auto set callback functions */
@@ -34,24 +40,16 @@ Colorx::Colorx()
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    /* configure glad */
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        exit(0);
-    }
-
-    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    //stbi_set_flip_vertically_on_load(true);
+   
 
     return;
 }
 
 void Colorx::initScene()
 {
-    smgr->addConeNode(smgr,glm::vec3(1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
-    smgr->addConeNode(smgr,glm::vec3(-1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
-
+    smgr->addCubeNode(smgr,glm::vec3(1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
+    // smgr->addConeNode(smgr,glm::vec3(1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
+    // smgr->addConeNode(smgr,glm::vec3(-1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
 }
 
 void Colorx::run()
@@ -60,7 +58,17 @@ void Colorx::run()
         float currentFrame = glfwGetTime();
         eventer->deltaTime = currentFrame - eventer->lastFrame;
         processInput(window);
-        smgr->drawAll(*shader);
+        
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        smgr->commonShader->use();
+        glm::mat4 projection = glm::perspective(glm::radians(smgr->camera->Zoom),SCR_WIDTH/SCR_HEIGHT,0.1f,100.0f);
+        glm::mat4 view = smgr->camera->GetViewMatrix();
+        smgr->commonShader->setMat4("projection",projection);
+        smgr->commonShader->setMat4("view",view);
+
+        smgr->drawAll(*(smgr->commonShader));
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
