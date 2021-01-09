@@ -45,7 +45,9 @@ Colorx::Colorx()
 
 void Colorx::initScene()
 {
-    smgr->addCubeNode(smgr,glm::vec3(0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
+    smgr->setupSMGR();
+
+	smgr->addCubeNode(smgr,glm::vec3(0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
     //smgr->addMeshSceneNode(smgr,"resourse/nanosuit",unPickable);
     
     // smgr->addConeNode(smgr,glm::vec3(1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);

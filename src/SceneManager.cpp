@@ -106,15 +106,15 @@ void SceneManager::setupSMGR()
 	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	// glEnableVertexAttribArray(1);
 	// texture coord attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	// You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
 	// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//2. Set SPHERE
 	GenStdSphere();
@@ -136,12 +136,12 @@ void SceneManager::setupSMGR()
 	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	// glEnableVertexAttribArray(1);
 	// texture coord attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//3. Set CYLINDER
 	GenStdCylinder();
@@ -163,12 +163,12 @@ void SceneManager::setupSMGR()
 	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	// glEnableVertexAttribArray(1);
 	// texture coord attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//4. Set CONE
 	GenStdCone();
@@ -190,12 +190,12 @@ void SceneManager::setupSMGR()
 	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	// glEnableVertexAttribArray(1);
 	// texture coord attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 //	Delete buffers
@@ -538,4 +538,157 @@ void SceneManager::GenStdCone()
 			this->StdCylinder_Index.push_back(offset);
 		}
 	}
+}
+
+
+void SceneManager::prtScreen()
+{
+	//	获取当前文件路径
+	wchar_t FullPath[MAX_PATH];
+	memset( FullPath, 0, sizeof(FullPath) );
+	std::wstring szExePath;
+	if (::GetModuleFileNameW( NULL, FullPath, sizeof(wchar_t)*MAX_PATH))
+	{
+		szExePath = FullPath;
+
+		int pos = szExePath.rfind( L'\\' );
+
+		if( -1 != pos )
+		{
+			szExePath = szExePath.substr(0,pos+1);
+		}
+	}
+
+	//	从窗口句柄获取窗口大小
+	int wWidth, wHeight;
+	glfwGetWindowSize(window, &wWidth, &wHeight);
+
+	//	以当前时间戳为存储截图文件名
+	time_t rawtime;
+	time(&rawtime);
+	std::wstring name = std::to_wstring(rawtime);
+	//	与文件路径、扩展名组合，成为完整文件名
+	//	（.png可改为.jpg等）
+	std::wstring szDestFile = szExePath + name;
+	szDestFile += L".png";
+
+
+	//	调用截图主函数
+	CaptureScreenShot(
+		wWidth, 
+		wHeight, 
+		szDestFile,
+		L"image/png"
+	);
+}
+
+bool SceneManager::CaptureScreenShot(
+	int nWidth, 
+	int nHeight, 
+	const std::wstring& szDestFile,
+	const std::wstring& szEncoderString)
+{
+	//	读取像素
+	UINT *pixels=new UINT[nWidth * nHeight];
+	memset(pixels, 0, sizeof(UINT)*nWidth*nHeight);
+
+	glFlush(); glFinish();
+
+	glReadPixels(0,0,nWidth,nHeight,GL_BGRA_EXT,GL_UNSIGNED_BYTE,pixels);
+
+	if(NULL==pixels)
+		return false;
+
+	//	使用GDI+库保存为图片
+	
+	//	Initialize GDI+
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
+	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+	{
+	//	Create the dest image
+	Gdiplus::Bitmap DestBmp(nWidth,nHeight,PixelFormat32bppARGB);
+
+	Gdiplus::Rect rect1(0, 0, nWidth, nHeight);
+
+	Gdiplus::BitmapData bitmapData;
+	memset( &bitmapData, 0, sizeof(bitmapData));
+	DestBmp.LockBits( 
+		&rect1, 
+		Gdiplus::ImageLockModeRead,
+		PixelFormat32bppARGB,
+		&bitmapData );
+
+	int nStride1 = bitmapData.Stride;
+	if( nStride1 < 0 )
+		nStride1 = -nStride1;
+
+	UINT* DestPixels = (UINT*)bitmapData.Scan0;
+
+	if( !DestPixels )
+	{
+		delete [] pixels;
+		return false;
+	}
+
+	for(UINT row = 0; row < bitmapData.Height; ++row)
+	{
+		for(UINT col = 0; col < bitmapData.Width; ++col)
+		{
+			DestPixels[row * nStride1 / 4 + col] = pixels[row * nWidth + col];
+		}
+	}
+
+	DestBmp.UnlockBits( 
+		&bitmapData );
+
+	delete [] pixels;
+	pixels = NULL;
+
+	DestBmp.RotateFlip( Gdiplus::RotateNoneFlipY );
+
+	CLSID Clsid;
+	int result = GetEncoderClsid(szEncoderString.c_str(), &Clsid);
+
+	if( result < 0 )
+		return false;
+
+	Gdiplus::Status status = DestBmp.Save( szDestFile.c_str(), &Clsid, NULL );
+	}
+	// Shutdown GDI+
+	Gdiplus::GdiplusShutdown(gdiplusToken);
+
+	return true;
+}
+
+int SceneManager::GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
+{
+	UINT num = 0;  // number of image encoders
+	UINT size = 0; // size of the image encoder array in bytes
+
+	Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
+
+	Gdiplus::GetImageEncodersSize(&num, &size);
+	if (size == 0)
+		return -1; // Failure
+
+	pImageCodecInfo = (Gdiplus::ImageCodecInfo *)(malloc(size));
+	if (pImageCodecInfo == NULL)
+		return -1; // Failure
+
+	Gdiplus::GetImageEncoders(num, size, pImageCodecInfo);
+
+	for (UINT j = 0; j < num; ++j)
+	{
+		if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+		{
+			*pClsid = pImageCodecInfo[j].Clsid;
+			free(pImageCodecInfo);
+			return j; // Success
+		}
+	}
+
+	free(pImageCodecInfo);
+	return -1; // Failure
 }

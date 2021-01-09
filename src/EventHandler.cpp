@@ -37,6 +37,9 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
         eventer->smgr->camera->ProcessKeyboard(RIGHT, eventer->deltaTime);
     }
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS){
+		eventer->smgr->prtScreen();
+	}
 
     return;
 }
