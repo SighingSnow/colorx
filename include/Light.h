@@ -9,7 +9,6 @@
 
 #ifndef LIGHT_H
 #define LIGHT_H
-#include <glfw/glfw3.h>
 #include <glm/glm.hpp>
 #include "Shader.h"
 #include <GLFW/glfw3.h>
@@ -60,6 +59,8 @@ public:
     void drawLight(Shader* lightShader, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 
     void drawDirectionLight(Shader* lightShader, glm::vec3 direction);
+
+    void drawPointLight(Shader* lightShader, glm::vec3 direction);
 
 private:
     GLFWwindow* window;

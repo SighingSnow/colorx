@@ -1,8 +1,8 @@
 #ifndef ASSIMP_REVISION_H_INC
 #define ASSIMP_REVISION_H_INC
 
-#define GitVersion 0xbd3a9c23
-#define GitBranch "eventhandler-dev"
+#define GitVersion 0x8f27890c
+#define GitBranch "dev"
 
 #define VER_MAJOR 5
 #define VER_MINOR 0
@@ -16,7 +16,7 @@
 #if (GitVersion == 0)
 #define VER_FILEVERSION_STR         STR(VER_MAJOR) "." STR(VER_MINOR) "." STR(VER_PATCH) "." STR(VER_BUILD)
 #else
-#define VER_FILEVERSION_STR         STR(VER_MAJOR) "." STR(VER_MINOR) "." STR(VER_PATCH) "." STR(VER_BUILD) " (Commit bd3a9c23)"
+#define VER_FILEVERSION_STR         STR(VER_MAJOR) "." STR(VER_MINOR) "." STR(VER_PATCH) "." STR(VER_BUILD) " (Commit 8f27890c)"
 #endif
 
 #ifdef  NDEBUG

@@ -113,6 +113,7 @@ public:
 
 	inline SceneManager(GLFWwindow* mywindow){
 		window = mywindow;
+		commonShader = new Shader();
 	};
 
 	~SceneManager();

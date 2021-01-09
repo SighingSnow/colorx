@@ -4,8 +4,6 @@
  */
 
 
-
-
 #include "../include/SceneManager.h"
 
 /*	Class SceneNode's constructor and draw(Shader &shader) function
