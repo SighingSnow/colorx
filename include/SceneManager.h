@@ -15,11 +15,10 @@
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
-#include <windows.h>
-#include <comdef.h>
-#include <gdiplus/gdiplus.h>
 #include <string>
+#include <sstream>
 #include <ctime>
+
 
 enum _TYPE_
 {
@@ -146,10 +145,6 @@ private:
 	std::vector<float> StdCone_Vertex;
 	std::vector<int> StdCone_Index;
 	void GenStdCone();
-
-	/* The following functions help print screen */
-	bool CaptureScreenShot(	int nWidth, int nHeight, const std::wstring& szDestFile, const std::wstring& szEncoderString);
-	int GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
 };
 
 #endif

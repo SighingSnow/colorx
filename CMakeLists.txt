@@ -41,5 +41,5 @@ aux_source_directory(src ENGINE_SRC)
 
 set(SOURCE_FILES main.cpp ${GLAD_SRC} ${ENGINE_SRC})
 add_executable(colorx ${SOURCE_FILES})
-target_link_libraries(colorx ${LIBS} gdiplus)
+target_link_libraries(colorx ${LIBS})
 

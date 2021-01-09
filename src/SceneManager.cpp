@@ -6,6 +6,8 @@
 
 #include "../include/SceneManager.h"
 
+#include "svpng.h"
+
 /*	Class SceneNode's constructor and draw(Shader &shader) function
  */
 inline SceneNode::SceneNode(TYPE Type):
@@ -543,152 +545,38 @@ void SceneManager::GenStdCone()
 
 void SceneManager::prtScreen()
 {
-	//	获取当前文件路径
-	wchar_t FullPath[MAX_PATH];
-	memset( FullPath, 0, sizeof(FullPath) );
-	std::wstring szExePath;
-	if (::GetModuleFileNameW( NULL, FullPath, sizeof(wchar_t)*MAX_PATH))
-	{
-		szExePath = FullPath;
-
-		int pos = szExePath.rfind( L'\\' );
-
-		if( -1 != pos )
-		{
-			szExePath = szExePath.substr(0,pos+1);
-		}
-	}
-
-	//	从窗口句柄获取窗口大小
 	int wWidth, wHeight;
 	glfwGetWindowSize(window, &wWidth, &wHeight);
 
-	//	以当前时间戳为存储截图文件名
 	time_t rawtime;
 	time(&rawtime);
-	std::wstring name = std::to_wstring(rawtime);
-	//	与文件路径、扩展名组合，成为完整文件名
-	//	（.png可改为.jpg等）
-	std::wstring szDestFile = szExePath + name;
-	szDestFile += L".png";
-
-
-	//	调用截图主函数
-	CaptureScreenShot(
-		wWidth, 
-		wHeight, 
-		szDestFile,
-		L"image/png"
-	);
-}
-
-bool SceneManager::CaptureScreenShot(
-	int nWidth, 
-	int nHeight, 
-	const std::wstring& szDestFile,
-	const std::wstring& szEncoderString)
-{
-	//	读取像素
-	UINT *pixels=new UINT[nWidth * nHeight];
-	memset(pixels, 0, sizeof(UINT)*nWidth*nHeight);
+	
+	std::ostringstream os;
+    os<<rawtime;
+    std::string pngname;
+    std::istringstream is(os.str());
+    is>>pngname;
+	
+	pngname += ".png";
+	
+	GLubyte pixels[wHeight][wWidth][3] = {'\0'};
 
 	glFlush(); glFinish();
 
-	glReadPixels(0,0,nWidth,nHeight,GL_BGRA_EXT,GL_UNSIGNED_BYTE,pixels);
+	glReadPixels(0, 0, wWidth, wHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
-	if(NULL==pixels)
-		return false;
+	for (int i = 0; i < wHeight/2; i++)
+		for (int j = 0; j < wWidth; j++)
+			for (int k = 0; k < 3; k++)
+			{
+				GLubyte temp = pixels[i][j][k];
+				pixels[i][j][k] = pixels[wHeight-i-1][j][k];
+				pixels[wHeight-i-1][j][k] = temp;
+			}
 
-	//	使用GDI+库保存为图片
-	
-	//	Initialize GDI+
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	ULONG_PTR gdiplusToken;
-	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    FILE *fp = fopen(pngname.c_str(), "wb+");
+    svpng(fp, wWidth, wHeight, &pixels[0][0][0], 0);
+    fclose(fp);
 
-	{
-	//	Create the dest image
-	Gdiplus::Bitmap DestBmp(nWidth,nHeight,PixelFormat32bppARGB);
-
-	Gdiplus::Rect rect1(0, 0, nWidth, nHeight);
-
-	Gdiplus::BitmapData bitmapData;
-	memset( &bitmapData, 0, sizeof(bitmapData));
-	DestBmp.LockBits( 
-		&rect1, 
-		Gdiplus::ImageLockModeRead,
-		PixelFormat32bppARGB,
-		&bitmapData );
-
-	int nStride1 = bitmapData.Stride;
-	if( nStride1 < 0 )
-		nStride1 = -nStride1;
-
-	UINT* DestPixels = (UINT*)bitmapData.Scan0;
-
-	if( !DestPixels )
-	{
-		delete [] pixels;
-		return false;
-	}
-
-	for(UINT row = 0; row < bitmapData.Height; ++row)
-	{
-		for(UINT col = 0; col < bitmapData.Width; ++col)
-		{
-			DestPixels[row * nStride1 / 4 + col] = pixels[row * nWidth + col];
-		}
-	}
-
-	DestBmp.UnlockBits( 
-		&bitmapData );
-
-	delete [] pixels;
-	pixels = NULL;
-
-	DestBmp.RotateFlip( Gdiplus::RotateNoneFlipY );
-
-	CLSID Clsid;
-	int result = GetEncoderClsid(szEncoderString.c_str(), &Clsid);
-
-	if( result < 0 )
-		return false;
-
-	Gdiplus::Status status = DestBmp.Save( szDestFile.c_str(), &Clsid, NULL );
-	}
-	// Shutdown GDI+
-	Gdiplus::GdiplusShutdown(gdiplusToken);
-
-	return true;
-}
-
-int SceneManager::GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
-{
-	UINT num = 0;  // number of image encoders
-	UINT size = 0; // size of the image encoder array in bytes
-
-	Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
-
-	Gdiplus::GetImageEncodersSize(&num, &size);
-	if (size == 0)
-		return -1; // Failure
-
-	pImageCodecInfo = (Gdiplus::ImageCodecInfo *)(malloc(size));
-	if (pImageCodecInfo == NULL)
-		return -1; // Failure
-
-	Gdiplus::GetImageEncoders(num, size, pImageCodecInfo);
-
-	for (UINT j = 0; j < num; ++j)
-	{
-		if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
-		{
-			*pClsid = pImageCodecInfo[j].Clsid;
-			free(pImageCodecInfo);
-			return j; // Success
-		}
-	}
-
-	free(pImageCodecInfo);
-	return -1; // Failure
+	free(pixels);
 }
