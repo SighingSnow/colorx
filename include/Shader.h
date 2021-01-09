@@ -23,6 +23,8 @@ public:
         std::ifstream vShaderFile;
         std::ifstream fShaderFile;
         std::ifstream gShaderFile;
+
+        std::cout<<vertexPath<<std::endl;
         // ensure ifstream objects can throw exceptions:
         vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
         fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
@@ -51,6 +53,8 @@ public:
                 gShaderFile.close();
                 geometryCode = gShaderStream.str();
             }
+
+           
         }
         catch (std::ifstream::failure& e)
         {
@@ -58,6 +62,7 @@ public:
         }
         const char* vShaderCode = vertexCode.c_str();
         const char * fShaderCode = fragmentCode.c_str();
+
         // 2. compile shaders
         unsigned int vertex, fragment;
         // vertex shader
@@ -70,6 +75,8 @@ public:
         glShaderSource(fragment, 1, &fShaderCode, NULL);
         glCompileShader(fragment);
         checkCompileErrors(fragment, "FRAGMENT");
+
+        std::cout<<"Hello world1"<<std::endl;
         // if geometry shader is given, compile geometry shader
         unsigned int geometry;
         if(geometryPath != nullptr)
@@ -91,6 +98,8 @@ public:
         // delete the shaders as they're linked into our program now and no longer necessery
         glDeleteShader(vertex);
         glDeleteShader(fragment);
+
+        std::cout<<"Hello world2"<<std::endl;
         if(geometryPath != nullptr)
             glDeleteShader(geometry);
 

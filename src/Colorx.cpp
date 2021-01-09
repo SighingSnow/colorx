@@ -25,7 +25,7 @@ Colorx::Colorx()
     }
     glfwMakeContextCurrent(window);
     
-    Shader shader((shaderPath+"nodeShader.vs").c_str(),(shaderPath+"nodeShader.fs").c_str());
+    Shader shader("./Shader/nodeShader.vs","./Shader/nodeShader.fs");
     /* pass the window and auto set light and camera */
     smgr = new SceneManager(window);
     /* auto set callback functions */

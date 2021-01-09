@@ -9,7 +9,7 @@
 
 #ifndef LIGHT_H
 #define LIGHT_H
-
+#include <glfw/glfw3.h>
 #include <glm/glm.hpp>
 #include "Shader.h"
 #include <GLFW/glfw3.h>
@@ -23,6 +23,7 @@ public:
     float constant;
     float linear;
     float quadratic;
+    float strength = 1.0;
 
     glm::vec3 ambient;
     glm::vec3 diffuse;
@@ -54,7 +55,11 @@ public:
 
     };
     
-    void drawLight(Shader* lightShader);
+    void setLight(Shader* lightShader, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+
+    void drawLight(Shader* lightShader, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+
+    void drawDirectionLight(Shader* lightShader, glm::vec3 direction);
 
 private:
     GLFWwindow* window;
