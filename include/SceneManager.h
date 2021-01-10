@@ -14,6 +14,12 @@
 #include "Core.h"
 #include <GLFW/glfw3.h>
 
+#include <stdio.h>
+#include <string>
+#include <sstream>
+#include <ctime>
+
+
 enum _TYPE_
 {
 	_MESH_SCENE_=0,

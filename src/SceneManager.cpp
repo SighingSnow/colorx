@@ -6,6 +6,8 @@
 
 #include "../include/SceneManager.h"
 
+#include "svpng.h"
+
 /*	Class SceneNode's constructor and draw(Shader &shader) function
  */
 /* This is just a test */
@@ -55,6 +57,7 @@ void SceneNode::draw(Shader &shader)
 		}
 	}
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 
@@ -387,4 +390,43 @@ void SceneNode::GenStdCone()
 			this->indices.push_back(offset);
 		}
 	}
+}
+
+
+void SceneManager::prtScreen()
+{
+	int wWidth, wHeight;
+	glfwGetWindowSize(window, &wWidth, &wHeight);
+
+	time_t rawtime;
+	time(&rawtime);
+	
+	std::ostringstream os;
+    os<<rawtime;
+    std::string pngname;
+    std::istringstream is(os.str());
+    is>>pngname;
+	
+	pngname += ".png";
+	
+	GLubyte pixels[wHeight][wWidth][3] = {'\0'};
+
+	glFlush(); glFinish();
+
+	glReadPixels(0, 0, wWidth, wHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	for (int i = 0; i < wHeight/2; i++)
+		for (int j = 0; j < wWidth; j++)
+			for (int k = 0; k < 3; k++)
+			{
+				GLubyte temp = pixels[i][j][k];
+				pixels[i][j][k] = pixels[wHeight-i-1][j][k];
+				pixels[wHeight-i-1][j][k] = temp;
+			}
+
+    FILE *fp = fopen(pngname.c_str(), "wb+");
+    svpng(fp, wWidth, wHeight, &pixels[0][0][0], 0);
+    fclose(fp);
+
+	free(pixels);
 }
