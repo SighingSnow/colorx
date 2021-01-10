@@ -34,11 +34,6 @@ public:
                 glShaderSource(vertex, 1, &meshNodeVShader, NULL);
                 glShaderSource(fragment, 1, &meshNodeFShader, NULL);
             }
-            case light_type:
-            {
-                glShaderSource(vertex, 1, &lightVShader, NULL);
-                glShaderSource(fragment, 1, &lightFShader, NULL);
-            }
         }
 
         glCompileShader(vertex);

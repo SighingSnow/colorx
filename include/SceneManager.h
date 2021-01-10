@@ -27,20 +27,18 @@ enum _TYPE_
 
 typedef enum _TYPE_ TYPE;
 
-
-namespace scene
-{
-	class SceneManager;
-};
-
 class SceneNode
 {
 public:
 	glm::vec3 pos;
 	glm::vec3 rotAxis;
 	glm::vec3 scale;
+	glm::vec3 color;
 	float rotAngle;
-
+	
+	std::vector<float> vertices;
+	std::vector<unsigned int> indices;
+	unsigned int VAO;
 	TYPE type;
 
 	bool active;
@@ -48,14 +46,70 @@ public:
 
 	int FaceName;
 
-	SceneNode(TYPE Type);
-	SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, TYPE Type,int id = 0);
+	inline SceneNode(TYPE Type)
+	{
+		type = Type;
+		pos= glm::vec3(0.0, 0.0, 0.0);
+		rotAngle = 0;
+		color = glm::vec3(1.0,1.0,1.0);
+		std::cout<<"Hello world"<<std::endl;
+		rotAxis	= glm::vec3(0.0, 0.0, 0.0);
+		scale = glm::vec3(1.0, 1.0, 1.0);
+		setUpSceneNode(type);
+	}
+
+	inline SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, TYPE Type, int id = 0 )
+	{
+		pos				= Pos;
+		rotAngle		= RotAngle;
+		rotAxis			= RotAxis;
+		scale			= Scale;
+		type			= Type;
+		setUpSceneNode(type);
+	}
 
 	void draw(Shader &shader);
 
 	~SceneNode(){
 		//delete this;
 	};
+private:
+	unsigned int VBO,EBO;
+	
+	void GenStdCube();
+	void GenStdSphere();
+
+	void GenStdCylinder();
+	void GenStdCone();
+
+	void setUpSceneNode(TYPE type){
+		switch(type){
+			case _CUBE_: GenStdCube(); break;
+			case _CONE_: GenStdCone(); break;
+			case _SPHERE_: GenStdSphere(); break;
+			case _CYLINDER_: GenStdCylinder(); break;
+			default: std::cout<<"Current type isn't supported.";break;
+		}
+		
+		glGenVertexArrays(1,&VAO);
+		glGenBuffers(1,&VBO);
+		glGenBuffers(1,&EBO);
+
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER,sizeof(float)*vertices.size(),&vertices[0], GL_STATIC_DRAW);  
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,indices.size()*sizeof(unsigned int),&indices[0],GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);	
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+        
+        glEnableVertexAttribArray(1);	
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,6*sizeof(float), (void*)(3*sizeof(float)));
+		
+		glBindVertexArray(0);
+	}
 };
 
 class SceneManager
@@ -64,30 +118,20 @@ public:
 	GLFWwindow *window;
 	Camera* camera;
 	Shader* commonShader;
-	Shader* lightShader;
 	Shader* meshShader;
 	bool collideMode;
 	bool constructNode;
 	bool destructNode;
 	std::vector<Model> meshNodes;
 	std::vector<Light> lights;
-	std::vector<SceneNode> sceneNodes;
+	std::vector<SceneNode> commonNodes;
 
 	inline SceneManager(GLFWwindow* mywindow){
 		window = mywindow;
 		commonShader = new Shader(ordinary_type);
 		meshShader = new Shader(mesh_type);
-		lightShader = new Shader(light_type);
 		camera = new Camera(glm::vec3(0.0f,0.0f,3.0f));
 	};
-
-	//Each node uses a set of VBO, VAO and EBO(if need)
-	unsigned int VBO[7];
-	unsigned int VAO[7];
-	unsigned int EBO[7];
-
-	void setupSMGR();			//Used before the render loop to bind VBO, VAO and EBOs(if need)
-	void deleteSMGR();			//Used at the end to delete those buffers
 
 	void addMeshSceneNode(SceneManager *smgr, const char* path ,int id);
 
@@ -107,10 +151,6 @@ public:
 
 	void addFrustumNode(SceneManager *smgr, int id, int faceNum = 3);
 
-	Light *addLightNode(SceneManager *smgr, int id);
-
-	Light *addFocusLightNode(SceneManager *smgr, int id);
-
 	/* draw all the meshNodes and Nodes */
 	void drawAll();
 
@@ -120,25 +160,9 @@ public:
 	~SceneManager();
 
 private:
-	std::vector<SceneNode> commonNodes;
+	
 
 	/* The following arrays and functions generate those standard polygons' coordinates we need */
-
-	std::vector<float> StdCube_Vertex;
-	std::vector<int> StdCube_Index;
-	void GenStdCube();
-
-	std::vector<float> StdSphere_Vertex;
-	std::vector<int> StdSphere_Index;
-	void GenStdSphere();
-
-	std::vector<float> StdCylinder_Vertex;
-	std::vector<int> StdCylinder_Index;
-	void GenStdCylinder();
-
-	std::vector<float> StdCone_Vertex;
-	std::vector<int> StdCone_Index;
-	void GenStdCone();
 };
 
 #endif
