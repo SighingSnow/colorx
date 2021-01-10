@@ -12,46 +12,46 @@
 #include <vector>
 using namespace std;
 
+
+//each vertex contains indices of its coordinate, normal and texture coordinate
+//coordinate, normal and coordinate data are stored in struct Model 
 struct Vertex {
-    // position
-    glm::vec3 Position;
-    // normal
-    glm::vec3 Normal;
-    // texCoords
-    glm::vec2 TexCoords;
-    // tangent
-    glm::vec3 Tangent;
-    // bitangent
-    glm::vec3 Bitangent;
+    GLuint verCoordIndex;       //vertex coordinate index
+    GLuint norIndex;            // normal index
+    GLuint texCoordIndex;       // texture coordinate index
+
 };
 
-struct Texture {
-    unsigned int id;
-    string type;
-    string path;
+struct Face{                    //store three vertices of the face
+    Vertex vertex1;
+    Vertex vertex2;
+    Vertex vertex3;
 };
+
+
+
 
 class Mesh {
 public:
     // mesh Data
-    vector<Vertex>       vertices;
-    vector<unsigned int> indices;
-    vector<Texture>      textures;
+    vector<Face>    faces;              //faces of the mesh
+    vector<GLuint>  texIndices;         //indices of textures used in this mesh
+                                        //texture data are stored in struct Model
+
     unsigned int VAO;
 
-    // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+    //constructor
+    Mesh(vector<Face> faces, vector<GLuint> texIndices)
     {
-        this->vertices = vertices;
-        this->indices = indices;
-        this->textures = textures;
-
-        // now that we have all the required data, set the vertex buffers and its attribute pointers.
+        this->faces=faces;
+        this->texIndices=texIndices;
         setupMesh();
     }
 
+
+
     // render the mesh
-    void Draw(Shader &shader);
+    void Draw(Shader &shader) {}
 
 private:
     // render data 
