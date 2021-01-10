@@ -59,7 +59,7 @@ public:
 		rotAngle = 0;
 		color = glm::vec3(1.0,1.0,1.0);
 		std::cout<<"Hello world"<<std::endl;
-		rotAxis	= glm::vec3(0.0, 0.0, 0.0);
+		rotAxis	= glm::vec3(1.0, 0.0, 0.0);
 		scale = glm::vec3(1.0, 1.0, 1.0);
 		setUpSceneNode(type);
 	}
@@ -67,7 +67,7 @@ public:
 	inline SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, TYPE Type, int id = 0 )
 	{
 		pos				= Pos;
-		rotAngle		= RotAngle;
+		rotAngle		= glm::radians(RotAngle);
 		rotAxis			= RotAxis;
 		scale			= Scale;
 		type			= Type;
@@ -108,11 +108,14 @@ private:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,indices.size()*sizeof(unsigned int),&indices[0],GL_STATIC_DRAW);
 
-        glEnableVertexAttribArray(0);	
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
         
-        glEnableVertexAttribArray(1);	
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,6*sizeof(float), (void*)(3*sizeof(float)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
+		
+		// glEnableVertexAttribArray(2);
+        // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
 		
 		glBindVertexArray(0);
 	}

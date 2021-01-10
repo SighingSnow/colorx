@@ -19,35 +19,43 @@ void SceneManager::addMeshSceneNode(SceneManager *smgr, const char* path ,int id
 
 void SceneNode::draw(Shader &shader)
 {
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, rotAngle, rotAxis);
+	model = glm::scale(model, scale);
+	model = glm::translate(model, pos);
+	model = glm::scale(model, glm::vec3(0.4f));
+    shader.setMat4("model", model);
 	switch (this->type)
 	{
 		case _CUBE_:
 		{
-			//glEnable(GL_CULL_FACE);
+			glEnable(GL_CULL_FACE);
 			glBindVertexArray(VAO);
-			glDrawElements(GL_TRIANGLES,indices.size(),GL_UNSIGNED_INT,0);
-			glBindVertexArray(0);
-			//glDisable(GL_CULL_FACE);
+			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+			glDisable(GL_CULL_FACE);
 			break;
 		}
 		case _SPHERE_:
 		{
 			glEnable(GL_CULL_FACE);
-			glDrawElements(GL_TRIANGLES, 60 * 60 * 6, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(VAO);
+			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 			glDisable(GL_CULL_FACE);
 			break;
 		}
 		case _CYLINDER_:
 		{
 			glEnable(GL_CULL_FACE);
-			glDrawElements(GL_TRIANGLES, 100 * 4 * 3, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(VAO);
+			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 			glDisable(GL_CULL_FACE);
 			break;
 		}
 		case _CONE_:
 		{
 			glEnable(GL_CULL_FACE);
-			glDrawElements(GL_TRIANGLES, 100 * 2 * 3, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(VAO);
+			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 			glDisable(GL_CULL_FACE);
 			break;
 		}
@@ -66,9 +74,9 @@ void SceneManager::drawAll()
 {
 	for (unsigned int i = 0; i < this->commonNodes.size(); i++)
 	{
-		this->commonNodes[i].draw(*(this->commonShader));	
+		this->commonNodes[i].draw(*(this->commonShader));
 	}
-	for(unsigned int i = 0;i < this->meshNodes.size();i++){
+	for(unsigned int i = 0; i < this->meshNodes.size(); i++){
 		this->meshNodes[i].Draw(*(this->meshShader));
 	}
 }
@@ -86,7 +94,7 @@ void SceneManager::addCubeNode(SceneManager *smgr, int id)
 
 	this->commonNodes.push_back(*Node);
 
-	//delete Node;
+	delete Node;
 }
 
 void SceneManager::addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
@@ -95,7 +103,7 @@ void SceneManager::addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle
 
 	this->commonNodes.push_back(*Node);
 
-	//delete Node;
+	delete Node;
 }
 
 void SceneManager::addSphereNode(SceneManager *smgr, int id)
@@ -159,11 +167,16 @@ void SceneManager::addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle
 void SceneNode::GenStdCube()
 {
 	//Save the common coords of a cube
-	float cube[8][3], texture[4][2];
+	float cube[8][3], normal[6][3] = {0.0f}, texture[4][2];
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 3; j++)
 		{
 			cube[i][j] = -0.5f + (i >> (2-j) & 1);
+		}
+	for (int i = 0; i < 6; i++)
+	{
+		int k = i%3, h = i&1;
+		normal[i][2-k] = 2*((float)h - 0.5f);
 	}
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 2; j++)
@@ -182,15 +195,28 @@ void SceneNode::GenStdCube()
 			this->vertices.push_back(cube[v][0]);
 			this->vertices.push_back(cube[v][1]);
 			this->vertices.push_back(cube[v][2]);
+			this->vertices.push_back(normal[i][0]);
+			this->vertices.push_back(normal[i][1]);
+			this->vertices.push_back(normal[i][2]);
 			this->vertices.push_back(texture[j][0]);
 			this->vertices.push_back(texture[j][1]);
 		}
-		this->indices.push_back(4*i + 0);
-		this->indices.push_back(4*i + 2);
-		this->indices.push_back(4*i + 1);
-		this->indices.push_back(4*i + 1);
-		this->indices.push_back(4*i + 2);
-		this->indices.push_back(4*i + 3);
+		if(i < 3){
+			this->indices.push_back(4*i + 0);
+			this->indices.push_back(4*i + 1);
+			this->indices.push_back(4*i + 2);
+			this->indices.push_back(4*i + 1);
+			this->indices.push_back(4*i + 3);
+			this->indices.push_back(4*i + 2);
+		}
+		else{
+			this->indices.push_back(4*i + 0);
+			this->indices.push_back(4*i + 2);
+			this->indices.push_back(4*i + 1);
+			this->indices.push_back(4*i + 1);
+			this->indices.push_back(4*i + 2);
+			this->indices.push_back(4*i + 3);
+		}
 	}
 	
 }
@@ -208,6 +234,11 @@ void SceneNode::GenStdSphere()
 			float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
 			float yPos = std::cos(ySegment * PI);
 			float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+			this->vertices.push_back(xPos);
+			this->vertices.push_back(yPos);
+			this->vertices.push_back(zPos);
+
+			//Normals
 			this->vertices.push_back(xPos);
 			this->vertices.push_back(yPos);
 			this->vertices.push_back(zPos);
@@ -241,6 +272,10 @@ void SceneNode::GenStdCylinder()
 		//Bottom circle
 		this->vertices.push_back(std::cos(i * Angle));
 		this->vertices.push_back(std::sin(i * Angle));
+		this->vertices.push_back(-0.5f);
+		//Bottom normals
+		this->vertices.push_back(std::cos(i * Angle));
+		this->vertices.push_back(std::sin(i * Angle));
 		this->vertices.push_back(0.0f);
 		//Bottom texture coords
 		this->vertices.push_back(i / 100);
@@ -249,7 +284,11 @@ void SceneNode::GenStdCylinder()
 		//Top circle
 		this->vertices.push_back(std::cos(i * Angle));
 		this->vertices.push_back(std::sin(i * Angle));
-		this->vertices.push_back(1.0f);
+		this->vertices.push_back(0.5f);
+		//Top normals
+		this->vertices.push_back(std::cos(i * Angle));
+		this->vertices.push_back(std::sin(i * Angle));
+		this->vertices.push_back(0.0f);
 		//Top texture coords
 		this->vertices.push_back(i / 100);
 		this->vertices.push_back(1.0f);
@@ -272,7 +311,11 @@ void SceneNode::GenStdCylinder()
 	//Bottom Center
 	this->vertices.push_back(0.0);
 	this->vertices.push_back(0.0);
+	this->vertices.push_back(-0.5);
+	//Bottom Center normal
 	this->vertices.push_back(0.0);
+	this->vertices.push_back(0.0);
+	this->vertices.push_back(-1.0);
 	//Bottom Center texture coords
 	this->vertices.push_back(0.5);
 	this->vertices.push_back(0.5);
@@ -284,7 +327,11 @@ void SceneNode::GenStdCylinder()
 		//Bottom circle
 		this->vertices.push_back(std::cos(i * Angle));
 		this->vertices.push_back(std::sin(i * Angle));
-		this->vertices.push_back(0.0f);
+		this->vertices.push_back(-0.5f);
+		//Bottom circle normal
+		this->vertices.push_back(0.0);
+		this->vertices.push_back(0.0);
+		this->vertices.push_back(-1.0);
 		//Texture coords
 		this->vertices.push_back(std::cos(i * Angle) / 2 + 0.5);
 		this->vertices.push_back(std::sin(i * Angle) / 2 + 0.5);
@@ -304,6 +351,10 @@ void SceneNode::GenStdCylinder()
 	//Top Center
 	this->vertices.push_back(0.0);
 	this->vertices.push_back(0.0);
+	this->vertices.push_back(0.5);
+	//Top Center normal
+	this->vertices.push_back(0.0);
+	this->vertices.push_back(0.0);
 	this->vertices.push_back(1.0);
 	//Top Center texture coords
 	this->vertices.push_back(0.5);
@@ -316,7 +367,11 @@ void SceneNode::GenStdCylinder()
 		//Top circle
 		this->vertices.push_back(std::cos(i * Angle));
 		this->vertices.push_back(std::sin(i * Angle));
-		this->vertices.push_back(1.0f);
+		this->vertices.push_back(0.5f);
+		//Top circle normal
+		this->vertices.push_back(0.0);
+		this->vertices.push_back(0.0);
+		this->vertices.push_back(1.0);
 		//Texture coords
 		this->vertices.push_back(std::cos(i * Angle) / 2 + 0.5);
 		this->vertices.push_back(std::sin(i * Angle) / 2 + 0.5);
@@ -337,6 +392,10 @@ void SceneNode::GenStdCone()
 	//Apex coords
 	this->vertices.push_back(0.0);
 	this->vertices.push_back(0.0);
+	this->vertices.push_back(0.5);
+	//Apex normal
+	this->vertices.push_back(0.0);
+	this->vertices.push_back(0.0);
 	this->vertices.push_back(1.0);
 	//Apex texture coords
 	this->vertices.push_back(0.5);
@@ -346,8 +405,12 @@ void SceneNode::GenStdCone()
 		//Lateral surface
 		this->vertices.push_back(std::cos(i * Angle));
 		this->vertices.push_back(std::sin(i * Angle));
-		this->vertices.push_back(0.0f);
-
+		this->vertices.push_back(-0.5f);
+		//Lateral normals
+		this->vertices.push_back(std::cos(i * Angle));
+		this->vertices.push_back(std::sin(i * Angle));
+		this->vertices.push_back(1.0f);
+		//Lateral texture coords
 		this->vertices.push_back(i / 100);
 		this->vertices.push_back(0.0f);
 
@@ -367,7 +430,11 @@ void SceneNode::GenStdCone()
 	//Bottom Center
 	this->vertices.push_back(0.0);
 	this->vertices.push_back(0.0);
+	this->vertices.push_back(-0.5);
+	//Bottom Center normal
 	this->vertices.push_back(0.0);
+	this->vertices.push_back(0.0);
+	this->vertices.push_back(-1.0);
 	//Center texture coords
 	this->vertices.push_back(0.5);
 	this->vertices.push_back(0.5);
@@ -378,7 +445,11 @@ void SceneNode::GenStdCone()
 	{
 		this->vertices.push_back(std::cos(i * Angle));
 		this->vertices.push_back(std::sin(i * Angle));
-		this->vertices.push_back(0.0f);
+		this->vertices.push_back(-0.5f);
+
+		this->vertices.push_back(0.0);
+		this->vertices.push_back(0.0);
+		this->vertices.push_back(-1.0);
 
 		this->vertices.push_back(std::cos(i * Angle) / 2 + 0.5);
 		this->vertices.push_back(std::sin(i * Angle) / 2 + 0.5);
