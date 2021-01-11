@@ -27,50 +27,74 @@ enum _TYPE_
 	_SPHERE_,
 	_CYLINDER_,
 	_CONE_,
-	_POLYHEDRON_,
-	_FRUSTUM_
+	_FRUSTUM_,
+	_PYRAMID_
 };
 
 typedef enum _TYPE_ TYPE;
 
+struct _TRANSFORM_ATTRIBUTE_
+{
+	glm::vec3 Position;
+	glm::vec3 RotAxis;
+	glm::vec3 Scale;
+	glm::vec3 Color;
+	float RotAngle;
+	// The number of faces is no less than 3
+	int FaceNum;
+	/*
+	 *	Ratio refers to the ratio between the radius of the top and the bottom circle.
+	 *	That is, Ratio = Radius(Top) / Radius(Bottom).
+	 *	Its domain is [0, 1]
+	 *	If it is 0, that the frustum becomes a pyramid
+	 */ 
+	float Ratio;
+};
+
+typedef struct _TRANSFORM_ATTRIBUTE_ transAttr;
+
 class SceneNode
 {
 public:
-	glm::vec3 pos;
-	glm::vec3 rotAxis;
-	glm::vec3 scale;
-	glm::vec3 color;
-	float rotAngle;
-	
+	TYPE type;
+
+	transAttr NodeAttr;
+
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
-	unsigned int VAO;
-	TYPE type;
 
 	bool active;
 	// Texture
 
-	int FaceName;
-
 	inline SceneNode(TYPE Type)
 	{
 		type = Type;
-		pos= glm::vec3(0.0, 0.0, 0.0);
-		rotAngle = 0;
-		color = glm::vec3(1.0,1.0,1.0);
-		rotAxis	= glm::vec3(1.0, 0.0, 0.0);
-		scale = glm::vec3(1.0, 1.0, 1.0);
+		NodeAttr.Position	= glm::vec3(0.0);
+		NodeAttr.RotAngle	= 0;
+		NodeAttr.RotAxis	= glm::vec3(1.0, 0.0, 0.0);
+		NodeAttr.Scale		= glm::vec3(1.0);
+		NodeAttr.Color		= glm::vec3(1.0);
+		NodeAttr.FaceNum	= 3;
+		NodeAttr.Ratio		= 1;
 		setUpSceneNode(type);
 	}
 
-	inline SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color ,TYPE Type, int id = 0 )
+	inline SceneNode(transAttr transform, TYPE Type, int id = 0 )
 	{
-		pos				= Pos;
-		rotAngle		= glm::radians(RotAngle);
-		rotAxis			= RotAxis;
-		scale			= Scale;
-		type			= Type;
-		color 			= Color;
+		type				= Type;
+		NodeAttr.Position	= transform.Position;
+		NodeAttr.RotAngle	= glm::radians(transform.RotAngle);
+		NodeAttr.RotAxis	= transform.RotAxis;
+		NodeAttr.Scale		= transform.Scale;
+		NodeAttr.Color		= transform.Color;
+		NodeAttr.FaceNum	= Type == _CYLINDER_ || Type == _CONE_ ? 100 : transform.FaceNum;
+		
+		if		(Type == _FRUSTUM_ 	|| Type == _PYRAMID_)		NodeAttr.FaceNum = transform.FaceNum;
+		else if (Type == _CONE_		|| Type == _CYLINDER_)		NodeAttr.FaceNum = 100;
+		
+		if		(Type == _FRUSTUM_ 	|| Type == _CYLINDER_)		NodeAttr.Ratio = transform.Ratio;
+		else if (Type == _CONE_		|| Type == _PYRAMID_)		NodeAttr.Ratio = 0;
+		
 		setUpSceneNode(type);
 	}
 
@@ -80,20 +104,21 @@ public:
 		//delete this;
 	};
 private:
-	unsigned int VBO,EBO;
+	unsigned int VAO,VBO,EBO;
 	
 	void GenStdCube();
 	void GenStdSphere();
 
-	void GenStdCylinder();
-	void GenStdCone();
+	void GenStdFrustum();
 
 	void setUpSceneNode(TYPE type){
 		switch(type){
 			case _CUBE_: GenStdCube(); break;
-			case _CONE_: GenStdCone(); break;
 			case _SPHERE_: GenStdSphere(); break;
-			case _CYLINDER_: GenStdCylinder(); break;
+			case _CYLINDER_:
+			case _CONE_:
+			case _FRUSTUM_:
+			case _PYRAMID_:	GenStdFrustum();break;
 			default: std::cout<<"Current type isn't supported.";break;
 		}
 		
@@ -135,6 +160,8 @@ public:
 	std::vector<Light> lights;
 	std::vector<SceneNode> commonNodes;
 
+	bool wire = false;
+
 	inline SceneManager(GLFWwindow* mywindow){
 		window = mywindow;
 		commonShader = new Shader(ordinary_type);
@@ -145,20 +172,22 @@ public:
 	void addMeshSceneNode(SceneManager *smgr, const char* path ,int id);
 
 	void addCubeNode(SceneManager *smgr, int id);
-	void addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id);
+	void addCubeNode(SceneManager *smgr, transAttr transform, int id);
 
 	void addSphereNode(SceneManager *smgr, int id);
-	void addSphereNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, glm::vec3 Color ,int id);
+	void addSphereNode(SceneManager *smgr, transAttr transform, int id);
 
 	void addCylinderNode(SceneManager *smgr, int id);
-	void addCylinderNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id);
+	void addCylinderNode(SceneManager *smgr, transAttr transform, int id);
 
 	void addConeNode(SceneManager *smgr, int id);
-	void addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id);
+	void addConeNode(SceneManager *smgr, transAttr transform, int id);
 
-	void addPolyhedronNode(SceneManager *smgr, int id, int faceNum = 3);
+	void addFrustumNode(SceneManager *smgr, int id);
+	void addFrustumNode(SceneManager *smgr, transAttr transform, int id);
 
-	void addFrustumNode(SceneManager *smgr, int id, int faceNum = 3);
+	void addPyramidNode(SceneManager *smgr, int id);
+	void addPyramidNode(SceneManager *smgr, transAttr transform, int id);
 
 	/* draw all the meshNodes and Nodes */
 	void drawAll();
@@ -170,8 +199,6 @@ public:
 
 private:
 	
-
-	/* The following arrays and functions generate those standard polygons' coordinates we need */
 };
 
 #endif

@@ -47,10 +47,40 @@ Colorx::Colorx()
 
 void Colorx::initScene()
 {
-    smgr->addCubeNode(smgr, glm::vec3(-1.2,0,0), 0.0f, glm::vec3(1,0,0), glm::vec3(1,1,1), glm::vec3(1.0,0.5,0.31),unPickable);
-    smgr->addSphereNode(smgr, glm::vec3(-0.5,0,0), 0.0f, glm::vec3(1,0,0), glm::vec3(0.8,0.8,0.8),glm::vec3(1.0,1.0,1.0) ,unPickable);
-	smgr->addCylinderNode(smgr, glm::vec3(0.4,0,0), -90.0f, glm::vec3(1,0,0), glm::vec3(1,1,2), glm::vec3(0.1,0.8,0.5),unPickable);
-	smgr->addConeNode(smgr, glm::vec3(1.4,0,0), -90.0f, glm::vec3(1,0,0), glm::vec3(1,1,2), glm::vec3(1.0,0.0,1.0),unPickable);
+    transAttr transform;
+	transform.Position = glm::vec3(-1.2,0,0);
+	transform.RotAngle = -90.0f;
+	transform.RotAxis = glm::vec3(1,0,0);
+	transform.Scale = glm::vec3(1);
+	transform.Color = glm::vec3(1.0,0.5,0.31);
+	transform.FaceNum = 3;
+	transform.Ratio = 1;
+	smgr->addCubeNode(smgr, transform, unPickable);
+	
+	transform.Position = glm::vec3(-0.6,0,0);
+	transform.Scale = glm::vec3(0.8);
+	transform.Color = glm::vec3(1);
+    smgr->addSphereNode(smgr,transform, unPickable);
+	
+	transform.Position = glm::vec3(0.3,0,0);
+	transform.Scale = glm::vec3(1,1,2);
+	transform.Color = glm::vec3(0.1,0.8,0.5);
+	smgr->addCylinderNode(smgr, transform, unPickable);
+	
+	transform.Position = glm::vec3(1.2,0,0);
+	transform.Color = glm::vec3(1.0,0.0,1.0);
+	smgr->addConeNode(smgr, transform, unPickable);
+	
+	transform.Position = glm::vec3(-1.8,0,0);
+	transform.FaceNum = 6;
+	transform.Ratio = 0.5;
+	transform.Color = glm::vec3(1.0,0.0,0.0);
+	smgr->addFrustumNode(smgr, transform, unPickable);
+	
+	transform.Position = glm::vec3(2.1,0,0);
+	transform.FaceNum = 4;
+	transform.Color = glm::vec3(1.0,1.0,0.0);
+	smgr->addPyramidNode(smgr, transform, unPickable);
     // std::cout<<smgr->commonNodes.size()<<std::endl;
     // std::cout<<smgr->commonNodes[0].type<<std::endl;
     //smgr->addMeshSceneNode(smgr,"resourse/nanosuit",unPickable);
@@ -73,18 +103,13 @@ void Colorx::run()
         smgr->commonShader->use();
         // smgr->meshShader->use();
         smgr->commonShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		smgr->commonShader->setVec3("lightPos", 1.2f, 1.0f, 2.0f);
+		smgr->commonShader->setVec3("lightPos", 1.2f, 1.0f, 3.0f);
 		smgr->commonShader->setVec3("viewPos", smgr->camera->Position);
 		
         glm::mat4 projection = glm::perspective(glm::radians(smgr->camera->Zoom),(float)SCR_WIDTH/SCR_HEIGHT,0.1f,100.0f);
         glm::mat4 view = smgr->camera->GetViewMatrix();
         smgr->commonShader->setMat4("projection",projection);
         smgr->commonShader->setMat4("view",view);
-        
-		// glm::mat4 model = glm::mat4(1.0f);
-		// model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		// model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-		// smgr->commonShader->setMat4("model", model);
 
         // smgr->meshShader->setMat4("projection", projection);
         // smgr->meshShader->setMat4("view", view);

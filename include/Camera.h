@@ -86,8 +86,8 @@ public:
         xoffset *= MouseSensitivity;
         yoffset *= MouseSensitivity;
 
-        Yaw   += xoffset;
-        Pitch += yoffset;
+        Yaw   += xoffset * 5;
+        Pitch += yoffset * 3;
 
         // make sure that when pitch is out of bounds, screen doesn't get flipped
         if (constrainPitch)

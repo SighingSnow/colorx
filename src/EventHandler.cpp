@@ -40,6 +40,9 @@ void processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS){
 		eventer->smgr->prtScreen();
 	}
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS){
+		eventer->smgr->wire = !eventer->smgr->wire;
+	}
 
     return;
 }
