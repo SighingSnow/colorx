@@ -100,6 +100,8 @@ public:
 
 	void draw(Shader &shader);
 
+	bool ifCollision(glm::vec3 nxtPos);
+
 	~SceneNode(){
 		//delete this;
 	};
@@ -194,6 +196,8 @@ public:
 
 	/* auto save to current dir */
 	void prtScreen();
+
+	bool ifCollision(glm::vec3 nxtPos);
 
 	~SceneManager();
 
