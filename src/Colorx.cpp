@@ -47,10 +47,10 @@ Colorx::Colorx()
 
 void Colorx::initScene()
 {
-    smgr->addCubeNode(smgr, glm::vec3(-1.2,0,0), 0.0f, glm::vec3(1,0,0), glm::vec3(1,1,1), unPickable);
-    smgr->addSphereNode(smgr, glm::vec3(-0.5,0,0), 0.0f, glm::vec3(1,0,0), glm::vec3(0.8,0.8,0.8), unPickable);
-	smgr->addCylinderNode(smgr, glm::vec3(0.4,0,0), -90.0f, glm::vec3(1,0,0), glm::vec3(1,1,2), unPickable);
-	smgr->addConeNode(smgr, glm::vec3(1.4,0,0), -90.0f, glm::vec3(1,0,0), glm::vec3(1,1,2), unPickable);
+    smgr->addCubeNode(smgr, glm::vec3(-1.2,0,0), 0.0f, glm::vec3(1,0,0), glm::vec3(1,1,1), glm::vec3(1.0,0.5,0.31),unPickable);
+    smgr->addSphereNode(smgr, glm::vec3(-0.5,0,0), 0.0f, glm::vec3(1,0,0), glm::vec3(0.8,0.8,0.8),glm::vec3(1.0,1.0,1.0) ,unPickable);
+	smgr->addCylinderNode(smgr, glm::vec3(0.4,0,0), -90.0f, glm::vec3(1,0,0), glm::vec3(1,1,2), glm::vec3(0.1,0.8,0.5),unPickable);
+	smgr->addConeNode(smgr, glm::vec3(1.4,0,0), -90.0f, glm::vec3(1,0,0), glm::vec3(1,1,2), glm::vec3(1.0,0.0,1.0),unPickable);
     // std::cout<<smgr->commonNodes.size()<<std::endl;
     // std::cout<<smgr->commonNodes[0].type<<std::endl;
     //smgr->addMeshSceneNode(smgr,"resourse/nanosuit",unPickable);
@@ -67,12 +67,11 @@ void Colorx::run()
         eventer->lastFrame = currentFrame;
         processInput(window);
         
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         smgr->commonShader->use();
         // smgr->meshShader->use();
-		smgr->commonShader->setVec3("objectColor",1.0f,0.51f,0.13f);
         smgr->commonShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 		smgr->commonShader->setVec3("lightPos", 1.2f, 1.0f, 2.0f);
 		smgr->commonShader->setVec3("viewPos", smgr->camera->Position);

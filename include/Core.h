@@ -33,7 +33,7 @@ static const char *nodeVShader = "#version 330 core\n"
     "uniform mat4 projection;\n"
     "void main()\n"
     "{\n"
-        "FragPos = vec3(model * vec4(aPos,1.0))\n"
+        "FragPos = vec3(model * vec4(aPos,1.0));\n"
         "Normal = mat3(transpose(inverse(model))) * aNormal;\n"
         "gl_Position = projection*view*model*vec4(aPos,1.0);\n"
     "}\0";

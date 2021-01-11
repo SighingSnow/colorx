@@ -28,11 +28,13 @@ public:
             {
                 glShaderSource(vertex, 1, &nodeVShader, NULL);
                 glShaderSource(fragment, 1, &nodeFShader, NULL);
+                break;
             }
             case mesh_type:
             {
                 glShaderSource(vertex, 1, &meshNodeVShader, NULL);
                 glShaderSource(fragment, 1, &meshNodeFShader, NULL);
+                break;
             }
         }
 
@@ -41,7 +43,7 @@ public:
 
         glCompileShader(fragment);
         checkCompileErrors(fragment, "FRAGMENT");
-        
+
         // shader Program
         ID = glCreateProgram();
         glAttachShader(ID, vertex);

@@ -25,6 +25,7 @@ void SceneNode::draw(Shader &shader)
 	model = glm::translate(model, pos);
 	model = glm::scale(model, glm::vec3(0.4f));
     shader.setMat4("model", model);
+	shader.setVec3("objectColor",color);
 	switch (this->type)
 	{
 		case _CUBE_:
@@ -97,9 +98,9 @@ void SceneManager::addCubeNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
+void SceneManager::addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, glm::vec3 Color ,int id)
 {
-	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, _CUBE_,id);
+	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale,Color ,_CUBE_,id);
 
 	this->commonNodes.push_back(*Node);
 
@@ -115,9 +116,9 @@ void SceneManager::addSphereNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addSphereNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
+void SceneManager::addSphereNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id)
 {
-	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, _SPHERE_,id);
+	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, Color,_SPHERE_,id);
 
 	this->commonNodes.push_back(*Node);
 
@@ -133,9 +134,9 @@ void SceneManager::addCylinderNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addCylinderNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
+void SceneManager::addCylinderNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id)
 {
-	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, _CYLINDER_,id);
+	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale,Color, _CYLINDER_,id);
 
 	this->commonNodes.push_back(*Node);
 
@@ -151,9 +152,9 @@ void SceneManager::addConeNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id)
+void SceneManager::addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id)
 {
-	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, _CONE_,id);
+	SceneNode* Node = new SceneNode(Pos, RotAngle, RotAxis, Scale, Color ,_CONE_,id);
 
 	this->commonNodes.push_back(*Node);
 
@@ -480,7 +481,8 @@ void SceneManager::prtScreen()
 	
 	pngname += ".png";
 	
-	GLubyte pixels[wHeight][wWidth][3] = {'\0'};
+	GLubyte pixels[wHeight][wWidth][3] ;
+	memset(pixels,0,wHeight*wWidth*3*sizeof(GLubyte));
 
 	glFlush(); glFinish();
 

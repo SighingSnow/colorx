@@ -58,19 +58,19 @@ public:
 		pos= glm::vec3(0.0, 0.0, 0.0);
 		rotAngle = 0;
 		color = glm::vec3(1.0,1.0,1.0);
-		std::cout<<"Hello world"<<std::endl;
 		rotAxis	= glm::vec3(1.0, 0.0, 0.0);
 		scale = glm::vec3(1.0, 1.0, 1.0);
 		setUpSceneNode(type);
 	}
 
-	inline SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, TYPE Type, int id = 0 )
+	inline SceneNode(glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color ,TYPE Type, int id = 0 )
 	{
 		pos				= Pos;
 		rotAngle		= glm::radians(RotAngle);
 		rotAxis			= RotAxis;
 		scale			= Scale;
 		type			= Type;
+		color 			= Color;
 		setUpSceneNode(type);
 	}
 
@@ -145,16 +145,16 @@ public:
 	void addMeshSceneNode(SceneManager *smgr, const char* path ,int id);
 
 	void addCubeNode(SceneManager *smgr, int id);
-	void addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id);
+	void addCubeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id);
 
 	void addSphereNode(SceneManager *smgr, int id);
-	void addSphereNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id);
+	void addSphereNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, glm::vec3 Color ,int id);
 
 	void addCylinderNode(SceneManager *smgr, int id);
-	void addCylinderNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id);
+	void addCylinderNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id);
 
 	void addConeNode(SceneManager *smgr, int id);
-	void addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale, int id);
+	void addConeNode(SceneManager *smgr, glm::vec3 Pos, float RotAngle, glm::vec3 RotAxis, glm::vec3 Scale,glm::vec3 Color , int id);
 
 	void addPolyhedronNode(SceneManager *smgr, int id, int faceNum = 3);
 
