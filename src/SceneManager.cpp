@@ -503,3 +503,29 @@ void SceneManager::prtScreen()
 
 	free(pixels);
 }
+
+bool SceneManager::ifCollision(glm::vec3 nxtPos){
+	for (unsigned int i = 0; i < this->commonNodes.size(); i++)
+	{
+		if(this->commonNodes[i].ifCollision(nxtPos)){
+			return true;
+		}
+	}
+	/*
+	for(unsigned int i = 0; i < this->meshNodes.size(); i++){
+		if(!this->meshNodes[i].ifCollision(nxtPos)){
+			return false;
+		}
+	}
+	*/
+	return false;
+}
+
+bool SceneNode::ifCollision(glm::vec3 nxtPos){
+	if(nxtPos[0]>pos[0]-0.5*scale[0] && nxtPos[0]<pos[0]+0.5*scale[0] &&
+		nxtPos[1]>pos[1]-0.5*scale[1] && nxtPos[1]<pos[1]+0.5*scale[1] &&
+		nxtPos[2]>pos[2]-0.5*scale[2] && nxtPos[2]<pos[2]+0.5*scale[2]
+	)
+		return true;
+	return false;
+}
