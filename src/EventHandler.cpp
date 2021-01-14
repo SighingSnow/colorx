@@ -149,18 +149,17 @@ void mouse_button_callback(GLFWwindow* window,int button, int action, int mods)
         glm::vec3 camPos = eventer->smgr->camera->getPostion();
         if(dot(faceNorm,camDir) > 0) faceNorm = -faceNorm;
 
-        std::cout<<"[Target]"<<target<<std::endl;
-        std::cout<<"[POS]"<<camPos[0]<<camPos[1]<<camPos[2]<<std::endl;;
+        // std::cout<<"[Target]"<<target<<std::endl;
+        // std::cout<<"[POS]"<<camPos[0]<<camPos[1]<<camPos[2]<<std::endl;;
         
         tAttr = eventer->smgr->commonNodes[target].NodeAttr;
         if(target != -1){
             //std::cout<<"[ORIGIN]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
             tAttr.Position +=  faceNorm;
-            std::cout<<"[RESULT]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
+            //std::cout<<"[RESULT]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
             eventer->smgr->addCubeNode(eventer->smgr,tAttr);
         }
         
-        printf("Hello\n");
     }
     if(glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS){
         glm::vec3 testVec;
