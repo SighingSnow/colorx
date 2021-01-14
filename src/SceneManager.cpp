@@ -11,7 +11,7 @@
 /*	Class SceneNode's constructor and draw(Shader &shader) function
  */
 /* This is just a test */
-void SceneManager::addMeshSceneNode(SceneManager *smgr, const char* path ,int id)
+void SceneManager::addMeshSceneNode(SceneManager *smgr, const char* path)
 {
 	Model ourModel("./resource/nanosuit/nanosuit.obj");
 	meshNodes.push_back(ourModel);
@@ -20,10 +20,11 @@ void SceneManager::addMeshSceneNode(SceneManager *smgr, const char* path ,int id
 void SceneNode::draw(Shader &shader)
 {
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, NodeAttr.RotAngle, NodeAttr.RotAxis);
+	/* Note if you change the model matrix here, the matrix in button_callback should also be modified. */
 	model = glm::scale(model, NodeAttr.Scale);
+	model = glm::rotate(model, NodeAttr.RotAngle, NodeAttr.RotAxis);
 	model = glm::translate(model, NodeAttr.Position);
-	model = glm::scale(model, glm::vec3(0.4f));
+
     shader.setMat4("model", model);
 	shader.setVec3("objectColor", NodeAttr.Color);
 
@@ -42,9 +43,11 @@ void SceneManager::drawAll()
 	if(wire)	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	for (unsigned int i = 0; i < this->commonNodes.size(); i++)
+	for (unsigned int i = 0; i < this->commonNodes.size() ; i++)
 	{
-		this->commonNodes[i].draw(*(this->commonShader));
+		if(commonNodes[i].NodeAttr.isAlive == true){
+			this->commonNodes[i].draw(*(this->commonShader));
+		}
 	}
 	for(unsigned int i = 0; i < this->meshNodes.size(); i++){
 		this->meshNodes[i].Draw(*(this->meshShader));
@@ -57,7 +60,7 @@ void SceneManager::drawAll()
  *	One requires no transformation parameters in input.
  *	The other one requires them.
  */
-void SceneManager::addCubeNode(SceneManager *smgr, int id)
+void SceneManager::addCubeNode(SceneManager *smgr)
 {
 	
 	SceneNode* Node = new SceneNode(_CUBE_);
@@ -67,16 +70,16 @@ void SceneManager::addCubeNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addCubeNode(SceneManager *smgr, transAttr transform, int id)
+void SceneManager::addCubeNode(SceneManager *smgr, transAttr transform)
 {
-	SceneNode* Node = new SceneNode(transform, _CUBE_, id);
+	SceneNode* Node = new SceneNode(transform, _CUBE_);
 
 	this->commonNodes.push_back(*Node);
 
 	delete Node;
 }
 
-void SceneManager::addSphereNode(SceneManager *smgr, int id)
+void SceneManager::addSphereNode(SceneManager *smgr)
 {
 	SceneNode* Node = new SceneNode(_SPHERE_);
 
@@ -85,16 +88,16 @@ void SceneManager::addSphereNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addSphereNode(SceneManager *smgr, transAttr transform, int id)
+void SceneManager::addSphereNode(SceneManager *smgr, transAttr transform)
 {
-	SceneNode* Node = new SceneNode(transform, _SPHERE_, id);
+	SceneNode* Node = new SceneNode(transform, _SPHERE_);
 
 	this->commonNodes.push_back(*Node);
 
 	delete Node;
 }
 
-void SceneManager::addCylinderNode(SceneManager *smgr, int id)
+void SceneManager::addCylinderNode(SceneManager *smgr)
 {
 	SceneNode* Node = new SceneNode(_CYLINDER_);
 
@@ -103,16 +106,16 @@ void SceneManager::addCylinderNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addCylinderNode(SceneManager *smgr, transAttr transform, int id)
+void SceneManager::addCylinderNode(SceneManager *smgr, transAttr transform)
 {
-	SceneNode* Node = new SceneNode(transform, _CYLINDER_, id);
+	SceneNode* Node = new SceneNode(transform, _CYLINDER_);
 
 	this->commonNodes.push_back(*Node);
 
 	delete Node;
 }
 
-void SceneManager::addConeNode(SceneManager *smgr, int id)
+void SceneManager::addConeNode(SceneManager *smgr)
 {
 	SceneNode* Node = new SceneNode(_CONE_);
 
@@ -121,16 +124,16 @@ void SceneManager::addConeNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addConeNode(SceneManager *smgr, transAttr transform, int id)
+void SceneManager::addConeNode(SceneManager *smgr, transAttr transform)
 {
-	SceneNode* Node = new SceneNode(transform, _CONE_, id);
+	SceneNode* Node = new SceneNode(transform, _CONE_);
 
 	this->commonNodes.push_back(*Node);
 
 	delete Node;
 }
 
-void SceneManager::addFrustumNode(SceneManager *smgr, int id)
+void SceneManager::addFrustumNode(SceneManager *smgr)
 {
 	SceneNode* Node = new SceneNode(_FRUSTUM_);
 
@@ -139,16 +142,16 @@ void SceneManager::addFrustumNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addFrustumNode(SceneManager *smgr, transAttr transform, int id)
+void SceneManager::addFrustumNode(SceneManager *smgr, transAttr transform)
 {
-	SceneNode* Node = new SceneNode(transform, _FRUSTUM_, id);
+	SceneNode* Node = new SceneNode(transform, _FRUSTUM_);
 
 	this->commonNodes.push_back(*Node);
 
 	delete Node;
 }
 
-void SceneManager::addPyramidNode(SceneManager *smgr, int id)
+void SceneManager::addPyramidNode(SceneManager *smgr)
 {
 	SceneNode* Node = new SceneNode(_PYRAMID_);
 
@@ -157,9 +160,9 @@ void SceneManager::addPyramidNode(SceneManager *smgr, int id)
 	delete Node;
 }
 
-void SceneManager::addPyramidNode(SceneManager *smgr, transAttr transform, int id)
+void SceneManager::addPyramidNode(SceneManager *smgr, transAttr transform)
 {
-	SceneNode* Node = new SceneNode(transform, _PYRAMID_, id);
+	SceneNode* Node = new SceneNode(transform, _PYRAMID_);
 
 	this->commonNodes.push_back(*Node);
 
@@ -432,4 +435,32 @@ void SceneManager::prtScreen()
     fclose(fp);
 
 	free(pixels);
+}
+
+/* imply Trumbore algorithm */
+bool SceneManager::intersect(glm::vec3 camPos,glm::vec3 camDir,glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,float& t,float& u,float& v)
+{
+	const float episilon = 0.00000001;
+	glm::vec3 e1 = p2 - p1;
+	glm::vec3 e2 = p3 - p1;
+	glm::vec3 s = camPos - p1;
+	glm::vec3 s1 = glm::cross(camDir,e2);
+	glm::vec3 s2 = glm::cross(s,e1);
+
+	float det = glm::dot(s1,e1);
+	float detT = glm::dot(s2,e2);
+	float detU = glm::dot(s1,s);
+	float detV = glm::dot(s2,camDir);
+	
+	if(det < episilon && det>-episilon) return false;
+	t = detT *(1.0/det);
+	u = detU *(1.0/det);
+	v = detV *(1.0/det);
+
+	if(u < 0 || u > 1) return false;
+	if(v < 0 || v > 1) return false;
+	if(u+v>1) return false;
+	if(t > episilon) return true;
+
+	return false;
 }

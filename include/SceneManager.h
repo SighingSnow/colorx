@@ -49,6 +49,8 @@ struct _TRANSFORM_ATTRIBUTE_
 	 *	If it is 0, that the frustum becomes a pyramid
 	 */ 
 	float Ratio;
+	bool pick;
+	bool isAlive;
 };
 
 typedef struct _TRANSFORM_ATTRIBUTE_ transAttr;
@@ -62,8 +64,6 @@ public:
 
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
-
-	bool active;
 	// Texture
 
 	inline SceneNode(TYPE Type)
@@ -76,10 +76,12 @@ public:
 		NodeAttr.Color		= glm::vec3(1.0);
 		NodeAttr.FaceNum	= 3;
 		NodeAttr.Ratio		= 1;
+		NodeAttr.pick 		= false;
+		NodeAttr.isAlive 	= true;
 		setUpSceneNode(type);
 	}
 
-	inline SceneNode(transAttr transform, TYPE Type, int id = 0 )
+	inline SceneNode(transAttr transform, TYPE Type)
 	{
 		type				= Type;
 		NodeAttr.Position	= transform.Position;
@@ -88,7 +90,9 @@ public:
 		NodeAttr.Scale		= transform.Scale;
 		NodeAttr.Color		= transform.Color;
 		NodeAttr.FaceNum	= Type == _CYLINDER_ || Type == _CONE_ ? 100 : transform.FaceNum;
-		
+		NodeAttr.pick 		= transform.pick;
+		NodeAttr.isAlive	= transform.isAlive;
+
 		if		(Type == _FRUSTUM_ 	|| Type == _PYRAMID_)		NodeAttr.FaceNum = transform.FaceNum;
 		else if (Type == _CONE_		|| Type == _CYLINDER_)		NodeAttr.FaceNum = 100;
 		
@@ -153,9 +157,6 @@ public:
 	Camera* camera;
 	Shader* commonShader;
 	Shader* meshShader;
-	bool collideMode;
-	bool constructNode;
-	bool destructNode;
 	std::vector<Model> meshNodes;
 	std::vector<Light> lights;
 	std::vector<SceneNode> commonNodes;
@@ -169,31 +170,33 @@ public:
 		camera = new Camera(glm::vec3(0.0f,0.0f,3.0f));
 	};
 
-	void addMeshSceneNode(SceneManager *smgr, const char* path ,int id);
+	void addMeshSceneNode(SceneManager *smgr, const char* path );
 
-	void addCubeNode(SceneManager *smgr, int id);
-	void addCubeNode(SceneManager *smgr, transAttr transform, int id);
+	void addCubeNode(SceneManager *smgr);
+	void addCubeNode(SceneManager *smgr, transAttr transform);
 
-	void addSphereNode(SceneManager *smgr, int id);
-	void addSphereNode(SceneManager *smgr, transAttr transform, int id);
+	void addSphereNode(SceneManager *smgr);
+	void addSphereNode(SceneManager *smgr, transAttr transform);
 
-	void addCylinderNode(SceneManager *smgr, int id);
-	void addCylinderNode(SceneManager *smgr, transAttr transform, int id);
+	void addCylinderNode(SceneManager *smgr);
+	void addCylinderNode(SceneManager *smgr, transAttr transform);
 
-	void addConeNode(SceneManager *smgr, int id);
-	void addConeNode(SceneManager *smgr, transAttr transform, int id);
+	void addConeNode(SceneManager *smgr);
+	void addConeNode(SceneManager *smgr, transAttr transform);
 
-	void addFrustumNode(SceneManager *smgr, int id);
-	void addFrustumNode(SceneManager *smgr, transAttr transform, int id);
+	void addFrustumNode(SceneManager *smgr);
+	void addFrustumNode(SceneManager *smgr, transAttr transform);
 
-	void addPyramidNode(SceneManager *smgr, int id);
-	void addPyramidNode(SceneManager *smgr, transAttr transform, int id);
+	void addPyramidNode(SceneManager *smgr);
+	void addPyramidNode(SceneManager *smgr, transAttr transform);
 
 	/* draw all the meshNodes and Nodes */
 	void drawAll();
 
 	/* auto save to current dir */
 	void prtScreen();
+
+	bool intersect(glm::vec3 camPos,glm::vec3 camDir,glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,float& t,float& u,float& v);
 
 	~SceneManager();
 

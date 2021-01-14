@@ -6,6 +6,11 @@
 const int SCR_WIDTH = 800;
 const int SCR_HEIGHT = 600;
 
+/* this should be use in glVertexAttrib */
+const unsigned int stepWidth = 8;
+
+const float Minier = 0.1;
+
 enum pick_type
 {
     unPickable,
