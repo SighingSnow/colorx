@@ -351,7 +351,7 @@ void SceneNode::GenStdFrustum()
 		if (i < fN)
 		{
 			this->indices.push_back(offset+1 + i);
-			this->indices.push_back(offset + i);
+			this->indices.push_back(offset   + i);
 			this->indices.push_back(offset-1);
 		}
 		else
@@ -391,7 +391,7 @@ void SceneNode::GenStdFrustum()
 		if (i < fN)
 		{
 			this->indices.push_back(offset-1);
-			this->indices.push_back(offset + i);
+			this->indices.push_back(offset   + i);
 			this->indices.push_back(offset+1 + i);
 		}
 	}
@@ -462,5 +462,31 @@ bool SceneManager::intersect(glm::vec3 camPos,glm::vec3 camDir,glm::vec3 p1,glm:
 	if(u+v>1) return false;
 	if(t > episilon) return true;
 
+	return false;
+}
+
+bool SceneManager::ifCollision(glm::vec3 nxtPos){
+	for (unsigned int i = 0; i < this->commonNodes.size(); i++)
+	{
+		if(this->commonNodes[i].ifCollision(nxtPos)){
+			return true;
+		}
+	}
+	/*
+	for(unsigned int i = 0; i < this->meshNodes.size(); i++){
+		if(!this->meshNodes[i].ifCollision(nxtPos)){
+			return false;
+		}
+	}
+	*/
+	return false;
+}
+
+bool SceneNode::ifCollision(glm::vec3 nxtPos){
+	if(nxtPos[0]>NodeAttr.Position[0]-0.5*NodeAttr.Scale[0] && nxtPos[0]<NodeAttr.Position[0]+0.5*NodeAttr.Scale[0] &&
+		nxtPos[1]>NodeAttr.Position[1]-0.5*NodeAttr.Scale[1] && nxtPos[1]<NodeAttr.Position[1]+0.5*NodeAttr.Scale[1] &&
+		nxtPos[2]>NodeAttr.Position[2]-0.5*NodeAttr.Scale[2] && nxtPos[2]<NodeAttr.Position[2]+0.5*NodeAttr.Scale[2]
+	)
+		return true;
 	return false;
 }

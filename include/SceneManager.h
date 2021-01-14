@@ -104,6 +104,8 @@ public:
 
 	void draw(Shader &shader);
 
+	bool ifCollision(glm::vec3 nxtPos);
+
 	~SceneNode(){
 		//delete this;
 	};
@@ -197,6 +199,7 @@ public:
 	void prtScreen();
 
 	bool intersect(glm::vec3 camPos,glm::vec3 camDir,glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,float& t,float& u,float& v);
+	bool ifCollision(glm::vec3 nxtPos);
 
 	~SceneManager();
 
