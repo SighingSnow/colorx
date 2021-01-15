@@ -12,8 +12,8 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Core.h"
+#include "stb_image.h"
 #include <GLFW/glfw3.h>
-
 #include <stdio.h>
 #include <string>
 #include <sstream>
@@ -59,16 +59,19 @@ class SceneNode
 {
 public:
 	TYPE type;
-
 	transAttr NodeAttr;
+	bool texture = false;
+	unsigned int textureID;
 
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
-	// Texture
 
-	inline SceneNode(TYPE Type)
+
+	inline SceneNode(TYPE Type, bool Texture = false, unsigned int TextureID = 0)
 	{
 		type = Type;
+		texture = Texture;
+		textureID = TextureID;
 		NodeAttr.Position	= glm::vec3(0.0);
 		NodeAttr.RotAngle	= 0;
 		NodeAttr.RotAxis	= glm::vec3(1.0, 0.0, 0.0);
@@ -81,15 +84,16 @@ public:
 		setUpSceneNode(type);
 	}
 
-	inline SceneNode(transAttr transform, TYPE Type)
+	inline SceneNode(transAttr transform, TYPE Type, bool Texture = false, unsigned int TextureID = 0)
 	{
 		type				= Type;
+		texture				= Texture;
+		textureID			= TextureID;
 		NodeAttr.Position	= transform.Position;
 		NodeAttr.RotAngle	= glm::radians(transform.RotAngle);
 		NodeAttr.RotAxis	= transform.RotAxis;
 		NodeAttr.Scale		= transform.Scale;
 		NodeAttr.Color		= transform.Color;
-		NodeAttr.FaceNum	= Type == _CYLINDER_ || Type == _CONE_ ? 100 : transform.FaceNum;
 		NodeAttr.pick 		= transform.pick;
 		NodeAttr.isAlive	= transform.isAlive;
 
@@ -111,10 +115,9 @@ public:
 	};
 private:
 	unsigned int VAO,VBO,EBO;
-	
+
 	void GenStdCube();
 	void GenStdSphere();
-
 	void GenStdFrustum();
 
 	void setUpSceneNode(TYPE type){
@@ -145,8 +148,8 @@ private:
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
 		
-		// glEnableVertexAttribArray(2);
-        // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+		glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
 		
 		glBindVertexArray(0);
 	}
@@ -165,6 +168,11 @@ public:
 
 	bool wire = false;
 
+	unsigned int StoneTex = loadTexture("../resource/texture_image/stone.png");
+	unsigned int ObsidianTex = loadTexture("../resource/texture_image/obsidian.png");
+	unsigned int WoodTex = loadTexture("../resource/texture_image/wood.png");
+	unsigned int BrickTex = loadTexture("../resource/texture_image/brick.png");
+
 	inline SceneManager(GLFWwindow* mywindow){
 		window = mywindow;
 		commonShader = new Shader(ordinary_type);
@@ -174,29 +182,31 @@ public:
 
 	void addMeshSceneNode(SceneManager *smgr, const char* path );
 
-	void addCubeNode(SceneManager *smgr);
-	void addCubeNode(SceneManager *smgr, transAttr transform);
+	void addCubeNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
+	void addCubeNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addSphereNode(SceneManager *smgr);
-	void addSphereNode(SceneManager *smgr, transAttr transform);
+	void addSphereNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
+	void addSphereNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addCylinderNode(SceneManager *smgr);
-	void addCylinderNode(SceneManager *smgr, transAttr transform);
+	void addCylinderNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
+	void addCylinderNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addConeNode(SceneManager *smgr);
-	void addConeNode(SceneManager *smgr, transAttr transform);
+	void addConeNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
+	void addConeNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addFrustumNode(SceneManager *smgr);
-	void addFrustumNode(SceneManager *smgr, transAttr transform);
+	void addFrustumNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
+	void addFrustumNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addPyramidNode(SceneManager *smgr);
-	void addPyramidNode(SceneManager *smgr, transAttr transform);
+	void addPyramidNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
+	void addPyramidNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
 	/* draw all the meshNodes and Nodes */
 	void drawAll();
 
 	/* auto save to current dir */
 	void prtScreen();
+
+	unsigned int loadTexture(char const * path);
 
 	bool intersect(glm::vec3 camPos,glm::vec3 camDir,glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,float& t,float& u,float& v);
 	bool ifCollision(glm::vec3 nxtPos);

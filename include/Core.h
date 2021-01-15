@@ -29,9 +29,10 @@ const float PI = 3.14159265358979323846f;
 static const char *nodeVShader = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec3 aNormal;\n"
-	// "layout (location = 2) in vec2 aTexCoords;\n"
+	"layout (location = 2) in vec2 aTexCoord;\n"
     "out vec3 FragPos;\n"
 	"out vec3 Normal;\n"
+	"out vec2 TexCoord;\n"
 
     "uniform mat4 model;\n"
     "uniform mat4 view;\n"
@@ -40,12 +41,17 @@ static const char *nodeVShader = "#version 330 core\n"
     "{\n"
         "FragPos = vec3(model * vec4(aPos,1.0));\n"
         "Normal = mat3(transpose(inverse(model))) * aNormal;\n"
+		"TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
         "gl_Position = projection*view*model*vec4(aPos,1.0);\n"
     "}\0";
 static const char *nodeFShader = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "in vec3 Normal;  \n"
     "in vec3 FragPos;  \n"
+	"in vec2 TexCoord;\n"
+
+	"uniform bool EnableTexture;\n"
+	"uniform sampler2D Texture;\n"
 
     "uniform vec3 lightPos; \n"
     "uniform vec3 viewPos; \n"
@@ -54,7 +60,7 @@ static const char *nodeFShader = "#version 330 core\n"
     "void main()\n"
     "{\n"
         // ambient
-        "float ambientStrength = 0.1;\n"
+        "float ambientStrength = 0.5;\n"
         "vec3 ambient = ambientStrength * lightColor;\n"
         
         // diffuse 
@@ -64,14 +70,15 @@ static const char *nodeFShader = "#version 330 core\n"
         "vec3 diffuse = diff * lightColor;\n"
         
         // specular
-        "float specularStrength = 0.5;\n"
+        "float specularStrength = 0.3;\n"
         "vec3 viewDir = normalize(viewPos - FragPos);\n"
         "vec3 reflectDir = reflect(-lightDir, norm);  \n"
         "float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);\n"
         "vec3 specular = specularStrength * spec * lightColor;  \n"
         
-        "vec3 result = (ambient + diffuse + specular) * objectColor;\n"
-        "FragColor = vec4(result, 1.0);\n"
+        "vec3 material = (ambient + diffuse + specular) * objectColor;\n"
+		"vec4 TexResult = EnableTexture ? texture(Texture, TexCoord) : vec4(1.0);\n"
+        "FragColor = vec4(material, 1.0) * TexResult;\n"
     "}\n\0";
 
 static const char *meshNodeVShader = "#version 330 core\n"
@@ -87,7 +94,6 @@ static const char *meshNodeVShader = "#version 330 core\n"
         "TexCoords = aTexCoords;\n"
     "   gl_Position = projection*view*model*vec4(aPos,1.0);\n"
     "}\0";
-
 static const char *meshNodeFShader = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "in vec2 TexCoords;\n"
