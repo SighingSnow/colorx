@@ -22,7 +22,7 @@ void SceneNode::draw(Shader &shader)
 	glm::mat4 model = glm::mat4(1.0f);
 	/* Note if you change the model matrix here, the matrix in button_callback should also be modified. */
 	model = glm::rotate(model, NodeAttr.RotAngle, NodeAttr.RotAxis);
-	model = glm::translate(model, NodeAttr.Position);
+	model = glm::translate(model, NodeAttr.Position * glm::vec3(Minier));
 	model = glm::scale(model, NodeAttr.Scale);
 
     shader.setMat4("model", model);
@@ -258,8 +258,8 @@ void SceneNode::GenStdSphere()
 			this->vertices.push_back(zPos);
 
 			//Texture coords
-			double u = std::atan2(zPos, xPos) / 2.0 / PI + 0.5;
-			double v = std::acos(yPos) / PI;
+			double u = xSegment;
+			double v = ySegment;
 			this->vertices.push_back((float)u);
 			this->vertices.push_back((float)v);
 
