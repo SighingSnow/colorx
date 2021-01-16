@@ -96,6 +96,7 @@ void Colorx::initScene()
 	
 	transform.Position = glm::vec3(-1,0,2.5);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
+	transform.Ratio = 1;
 	smgr->addCylinderNode(smgr, transform, true, smgr->StoneTex);
 	
 	transform.Position = glm::vec3(2,0,2.5);
@@ -122,6 +123,7 @@ void Colorx::initScene()
 	
 	transform.Position = glm::vec3(-1,0,5);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
+	transform.Ratio = 1;
 	smgr->addCylinderNode(smgr, transform, true, smgr->ObsidianTex);
 	
 	transform.Position = glm::vec3(2,0,5);
@@ -148,6 +150,7 @@ void Colorx::initScene()
 	
 	transform.Position = glm::vec3(-1,0,-2.5);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
+	transform.Ratio = 1;
 	smgr->addCylinderNode(smgr, transform, true, smgr->WoodTex);
 	
 	transform.Position = glm::vec3(2,0,-2.5);
@@ -174,6 +177,7 @@ void Colorx::initScene()
 	
 	transform.Position = glm::vec3(-1,0,-5);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
+	transform.Ratio = 1;
 	smgr->addCylinderNode(smgr, transform, true, smgr->BrickTex);
 	
 	transform.Position = glm::vec3(2,0,-5);

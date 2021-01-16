@@ -243,11 +243,11 @@ void SceneNode::GenStdSphere()
 		for (int i = 0; i <= 60; i++)
 		{
 			//Vertices
-			float xSegment = (float)i / (float)60;
-			float ySegment = (float)j / (float)60;
-			float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-			float yPos = std::cos(ySegment * PI);
-			float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+			float Theta = (float)i / (float)60 * 2.0f * PI;
+			float Psi = (float)j / (float)60 * PI;
+			float xPos = std::cos(Theta) * std::sin(Psi);
+			float yPos = std::sin(Theta) * std::sin(Psi);
+			float zPos = std::cos(Psi);
 			this->vertices.push_back(xPos);
 			this->vertices.push_back(yPos);
 			this->vertices.push_back(zPos);
@@ -258,10 +258,10 @@ void SceneNode::GenStdSphere()
 			this->vertices.push_back(zPos);
 
 			//Texture coords
-			double u = xSegment;
-			double v = ySegment;
-			this->vertices.push_back((float)u);
-			this->vertices.push_back((float)v);
+			float u = Theta / 2.0f / PI;
+			float v = Psi / PI;
+			this->vertices.push_back(u);
+			this->vertices.push_back(v);
 
 			//this->indices
 			if (j < 60 && i < 60)
