@@ -101,6 +101,8 @@ void mouse_button_callback(GLFWwindow* window,int button, int action, int mods)
         /* set smgr render mode */
         glm::mat4 trans;
         transAttr tAttr;
+		bool tTex;
+		unsigned int tTexID;
         float t,u,v,tmpT;
         glm::vec3 e1,e2;
         glm::vec3 faceNorm;
@@ -153,11 +155,13 @@ void mouse_button_callback(GLFWwindow* window,int button, int action, int mods)
         // std::cout<<"[POS]"<<camPos[0]<<camPos[1]<<camPos[2]<<std::endl;;
         
         tAttr = eventer->smgr->commonNodes[target].NodeAttr;
+		tTex = eventer->smgr->commonNodes[target].texture;
+		tTexID = eventer->smgr->commonNodes[target].textureID;
         if(target != -1){
             //std::cout<<"[ORIGIN]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
             tAttr.Position +=  faceNorm;
             //std::cout<<"[RESULT]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
-            eventer->smgr->addCubeNode(eventer->smgr,tAttr);
+            eventer->smgr->addCubeNode(eventer->smgr,tAttr,tTex,tTexID);
         }
         
     }
