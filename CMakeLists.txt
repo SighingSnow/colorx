@@ -25,13 +25,13 @@ include_directories(opengl_helper/glad/include)
 #config glm
 include_directories(opengl_helper/glm)
 
-#config assimp
-option(ASSIMP_BUILD_DOCS OFF)
-option(ASSIMP_BUILD_EXAMPLES OFF)
-option(ASSIMP_BUILD_TESTS OFF)
-add_subdirectory(opengl_helper/assimp)
-include_directories(opengl_helper/assimp/include)
-LIST(APPEND LIBS assimp ${ASSIMP_LIBRARIES})
+# #config assimp
+# option(ASSIMP_BUILD_DOCS OFF)
+# option(ASSIMP_BUILD_EXAMPLES OFF)
+# option(ASSIMP_BUILD_TESTS OFF)
+# add_subdirectory(opengl_helper/assimp)
+# include_directories(opengl_helper/assimp/include)
+# LIST(APPEND LIBS assimp ${ASSIMP_LIBRARIES})
 
 #config our engine
 include_directories(include)
