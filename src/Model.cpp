@@ -6,6 +6,12 @@
 
 #include "stb_image.h"
 
+#include<fstream>
+#include<iostream>
+
+#define NOT_A_INDEX -1
+
+
 //render the model
 void Model::Draw(Shader &shader)
 {
@@ -14,191 +20,389 @@ void Model::Draw(Shader &shader)
         meshes[i].Draw(shader);
 }
 
-
-void Model::loadModel(std::string path)
+//load a model from a .obj file
+void Model::loadModel(std::string modelPath)
 {
-    Assimp::Importer importer;
-    //import a module into assimp scene
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-    //const aiScene *scene=importer.ReadFile(path,aiProcess_Triangulate|aiProcess_FlipUVs|aiProcess_GenNormals);
 
-    /* check if the scene and the root node of the scene are not null 
-    and check one of its flags to see if the returned data is incomplete.*/
-    if(!scene||scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-    {
-        cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
-        return;
-    }
-    directory=path.substr(0,path.find_last_of('/'));    //store the given file path into directiory
-    processNode(scene->mRootNode,scene);        //recursively process each node of the assimp scene from mRootNode
-}
-
-
-
-//recursively process each node of the assimp scene
-void Model::processNode(aiNode *node, const aiScene *scene)
-{
-    //process all the node's meshes
-    for(unsigned int i=0;i<node->mNumMeshes;i++)
-    {
-        aiMesh *mesh=scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh,scene));      //store the processed mesh into "meshes" vector
-    }
-    //then do the same for each of its children
-    for(unsigned int i=0;i<node->mNumChildren;i++)
-    {
-        processNode(node->mChildren[i],scene);
-    }
-}
-
-//translate an aiMesh object to a mesh object
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
-{
-    vector<Vertex> vertices;
-    vector<unsigned int> indices;
+    std::ifstream ifs(modelPath);
+    std::string line;
+    vector<Face>   faces;
     vector<Texture> textures;
-
-    //retrieve each vertex's data
-    for(unsigned int i=0;i<mesh->mNumVertices;i++)
+    //Mesh *mesh=(Mesh *)malloc(sizeof(Mesh));
+    bool hasTexture=false;                       //if the model contains texture coordinates
+    bool hasNormal=false;                        //if the model contains normal data
+    bool isFirstMesh=true;
+    while(getline(ifs,line))
     {
-        Vertex vertex;
-        glm::vec3 vector;
-
-        //process vertex positions
-        vector.x=mesh->mVertices[i].x;
-        vector.y=mesh->mVertices[i].y;
-        vector.z=mesh->mVertices[i].z;
-        vertex.Position=vector;
-
-        //process vertex normals
-        if (mesh->HasNormals())
+        if(line.substr(0,6)=="mtllib")              //declaration of reference material library
         {
-            vector.x = mesh->mNormals[i].x;
-            vector.y = mesh->mNormals[i].y;
-            vector.z = mesh->mNormals[i].z;
-            vertex.Normal = vector;
+            loadMaterial(this->directory+"/"+line.substr(7));
         }
-
-        //process texture coordinates
-        if(mesh->mTextureCoords[0])         //to see if the mesh contain texture coordinates
+        else if(line.substr(0,2)=="vt")              //Vertex texture coordinates
         {
-            glm::vec2 vec;
-            // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't
-            // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
-            vec.x = mesh->mTextureCoords[0][i].x;
-            vec.y = mesh->mTextureCoords[0][i].y;
-            vertex.TexCoords = vec;
-            // tangent
-            vector.x = mesh->mTangents[i].x;
-            vector.y = mesh->mTangents[i].y;
-            vector.z = mesh->mTangents[i].z;
-            vertex.Tangent = vector;
-            // bitangent
-            vector.x = mesh->mBitangents[i].x;
-            vector.y = mesh->mBitangents[i].y;
-            vector.z = mesh->mBitangents[i].z;
-            vertex.Bitangent = vector;
+            hasTexture=true;
+            std::istringstream s(line.substr(2));
+            glm::vec2 texcoord;
+            s >> texcoord.x;
+            s >> texcoord.y;
+            this->texCoords.push_back(texcoord);
+        }
+        else if(line.substr(0,2)=="vn")         //vertex normal
+        {
+            hasNormal=true;
+            std::istringstream s(line.substr(2));
+            glm::vec3 normal;
+            s>>normal.x;
+            s>>normal.y;
+            s>>normal.z;
+            this->normals.push_back(normal);
+        }
+        else if(line.substr(0,1)=="v")          //vertex coordinates
+        {
+            std::istringstream s(line.substr(1));
+            glm::vec3 vercoord;
+            s>>vercoord.x;
+            s>>vercoord.y;
+            s>>vercoord.z;
+            this->verCoords.push_back(vercoord);
+        }
+        else if(line.substr(0,1)=="f")          //face data
+        {
+            vector<VertexWithIndex> vec;
+            VertexWithIndex vertex;
+            string vertexStr;
+            std::istringstream s(line.substr(1));
+
+            while(s>>vertexStr)
+            {
+                GLuint verCoordIndex;
+                GLuint texCoordIndex;
+                GLuint norIndex;
+               
+                // if(vertexStr.rfind('/')==vertexStr.find('/'))
+                // {
+                //     hasNormal=false;
+                // }
+                if(hasTexture&&hasNormal)
+                {
+                    verCoordIndex=stoi(vertexStr.substr(0,vertexStr.find('/')))-1;        //vertex coordinates index
+                    texCoordIndex = stoi(vertexStr.substr(vertexStr.find('/') + 1, vertexStr.rfind('/') - vertexStr.find('/'))) - 1; //texture coordinates index
+                    norIndex = stoi(vertexStr.substr(vertexStr.rfind('/') + 1)) - 1; //normal index
+                    
+                }
+                else if(hasTexture&&(!hasNormal))
+                {
+                    verCoordIndex=stoi(vertexStr.substr(0,vertexStr.find('/')))-1;        //vertex coordinates index
+                    texCoordIndex=stoi(vertexStr.substr(vertexStr.find('/') + 1)) - 1;   //texture coordinates index
+                    norIndex=NOT_A_INDEX;
+                }
+                else if((!hasTexture)&&hasNormal)
+                {
+                    verCoordIndex=stoi(vertexStr.substr(0,vertexStr.find('/')))-1;        //vertex coordinates index
+                    texCoordIndex=NOT_A_INDEX;
+                    norIndex=stoi(vertexStr.substr(vertexStr.rfind('/')+1))-1;      //normal index
+                }
+                else
+                {
+                    verCoordIndex = stoi(vertexStr) - 1;            //texture coordinates index
+                    texCoordIndex=NOT_A_INDEX;
+                    norIndex=NOT_A_INDEX;
+                }
+                vertex.verCoordIndex=verCoordIndex;
+                vertex.texCoordIndex = texCoordIndex;
+                vertex.norIndex = norIndex;
+                vec.push_back(vertex);
+            }
+
+            //Triangulate the face
+            int vertexNum=vec.size();           //vertex number of the face
+            int triangleNum=vertexNum-2;        //number of triangles in this face
+            VertexWithIndex first=vec.front();           //the first vertex in vector
+            vec.erase(vec.begin());
+            for(int i=0;i<triangleNum;i++)
+            {
+                Face face;
+                face.vertex1=vec.front();
+                vec.erase(vec.begin());
+                face.vertex2=vec.front();
+                face.vertex3=first;
+                faces.push_back(face);     //store the triangle face into the mesh
+            }
+
+        }
+        //else if(line[0]=='g')                   //another group
+        //{
+        //    //store last mesh
+        //    if (!isFirstMesh)
+        //    {
+        //        Mesh mesh(faces, textures);
+        //        if (!hasNormal)
+        //            GenNormals(mesh);
+        //        this->meshes.push_back(mesh);       //store this mesh
+        //        faces.clear();
+        //        textures.clear();
+        //        hasTexture = false;                    //set hasTexture
+        //        hasNormal = false;                     //set hasNormal
+        //    }
+        //    else
+        //    {
+        //        isFirstMesh = false;
+        //    }
+        //}
+        //else if (line[0] == 'o')                   //another object
+        //{
+        //    //store last mesh
+        //    if (!isFirstMesh)
+        //    {
+        //        Mesh mesh(faces, textures);
+        //        if (!hasNormal)
+        //            GenNormals(mesh);
+        //        this->meshes.push_back(mesh);       //store this mesh
+        //        faces.clear();
+        //        textures.clear();
+        //        hasTexture = false;                    //set hasTexture
+        //        hasNormal = false;                     //set hasNormal
+        //    }
+        //    else
+        //    {
+        //        isFirstMesh = false;
+        //    }
+        //}
+        else if(line.substr(0,6)=="usemtl")     //declaration of using material
+        {
+            //store last mesh
+            if (!isFirstMesh)
+            {
+                Mesh mesh(faces, textures);
+                if (!hasNormal)
+                    GenNormals(mesh);
+                this->meshes.push_back(mesh);       //store this mesh
+                faces.clear();
+                textures.clear();
+                //hasTexture = false;                    //set hasTexture
+                //hasNormal = false;                     //set hasNormal
+            }
+            else
+            {
+                isFirstMesh = false;
+            }
+
+            string mtlName=line.substr(7);
+            //scan through the loaded textures to find the corresponding textures belonging to the material
+            for(int i=0;i<this->texturesLoaded.size();i++)
+            {
+                Texture tex=this->texturesLoaded[i];
+                if(tex.mtlName==mtlName)
+                {
+                    textures.push_back(tex);        //store the texture index
+                }
+            }
+        }
+        else if(line[0]=='#')                   //comments
+        {
+            //skip the line
+        }
+        
+    }
+
+
+    //read obj file ended
+
+    Mesh mesh(faces,textures);
+    if (!hasNormal)
+        GenNormals(mesh);
+    this->meshes.push_back(mesh); //store this mesh
+    faces.clear();
+    textures.clear();
+
+    //normalize all normals
+    for(int i=0;i<this->normals.size();i++)
+    {
+        this->normals[i]=glm::normalize(this->normals[i]);
+    }
+
+}
+
+
+//generate normal for each vertex of the mesh
+void Model::GenNormals(Mesh &mesh)
+{
+    GLuint *map = (GLuint *)malloc(sizeof(GLuint) * (this->verCoords.size())); //map from vertex index to normal index
+    for (int i = 0; i < this->verCoords.size(); i++)                           //initialize map
+    {
+        map[i] = NOT_A_INDEX;
+    }
+    VertexWithIndex *v1, *v2, *v3;
+    glm::vec3 temp_vec1, temp_vec2, vec;
+    Face *face;
+    //iterate through each face
+    for (int i = 0; i < mesh.faces.size(); i++)
+    {
+        face = &(mesh.faces[i]);
+        v1 = &(face->vertex1);
+        v2 = &(face->vertex2);
+        v3 = &(face->vertex3);
+        temp_vec1 = this->verCoords[v1->verCoordIndex] - this->verCoords[v2->verCoordIndex];
+        temp_vec2 = this->verCoords[v2->verCoordIndex] - this->verCoords[v3->verCoordIndex];
+        vec = glm::normalize(glm::cross(temp_vec1, temp_vec2)); //Cross product of two vectors, normalization
+        //add the vec to v1's normal
+        if (map[v1->verCoordIndex] == NOT_A_INDEX) //this vertex normal hasn't been calculated
+        {
+            map[v1->verCoordIndex] = this->normals.size();
+            v1->norIndex = this->normals.size();
+            this->normals.push_back(vec);
         }
         else
         {
-            vertex.TexCoords=glm::vec2(0.0f,0.0f);
+            this->normals[map[v1->verCoordIndex]] += vec;
         }
-
-        //push the vertex to the back of "vertices" vector
-        vertices.push_back(vertex);
-        
-
-    }
-
-    // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
-    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-    {
-        aiFace face = mesh->mFaces[i];
-        for (unsigned int j = 0; j < face.mNumIndices; j++)
+        //add the vec to v2's normal
+        if (map[v2->verCoordIndex] == NOT_A_INDEX) //this vertex normal hasn't been calculated
         {
-            indices.push_back(face.mIndices[j]); //push the vertex index of each face to the back of "indices" vector
+            map[v2->verCoordIndex] = this->normals.size();
+            v2->norIndex = this->normals.size();
+            this->normals.push_back(vec);
+        }
+        else
+        {
+            this->normals[map[v2->verCoordIndex]] += vec;
+        }
+        //add the vec to v3's normal
+        if (map[v3->verCoordIndex] == NOT_A_INDEX) //this vertex normal hasn't been calculated
+        {
+            map[v3->verCoordIndex] = this->normals.size();
+            v3->norIndex = this->normals.size();
+            this->normals.push_back(vec);
+        }
+        else
+        {
+            this->normals[map[v3->verCoordIndex]] += vec;
         }
     }
 
-    //process mesh material
-    if (mesh->mMaterialIndex >= 0)
-    {
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];    
-        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-        // Same applies to other texture as the following list summarizes:
-        // diffuse: texture_diffuseN
-        // specular: texture_specularN
-        // normal: texture_normalN
-
-        // 1. diffuse maps
-        vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        // 2. specular maps
-        vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-        // 3. normal maps
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-        // 4. height maps
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-        textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-    }
-
-    // return a mesh object created from the extracted mesh data
-    return Mesh(vertices,indices,textures);
-
+    delete[] map;
 }
 
 
-// checks all material textures of a given type and loads the textures if they're not loaded yet.
-// the required info is returned as a Texture struct.
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
+//load material from .mtl file
+void Model::loadMaterial(string materialPath)
 {
-    vector<Texture> textures;
-    for(unsigned int i=0;i<mat->GetTextureCount(type);i++)  //check the amount of textures stored in the material 
+    vector<Texture> texturesLoaded;
+    std::ifstream ifs(materialPath);
+    std::string line;
+    Texture tex;
+    string mtlName;
+    while(getline(ifs,line))
     {
-        aiString str;
-        mat->GetTexture(type,i,&str);    // retrieve each of the texture's file locations and stores the result in an aiString.
-        bool skip=false;
-        for(unsigned int j=0;j<textures_loaded.size();j++)
+        string ltype;
+        std::istringstream s(line);
+        s>>ltype;
+        if(ltype=="newmtl")             //a new material
         {
-            //check if this texture has already been loaded
-            //if so, directly use the texture texture_loaded
-            if(std::strcmp(textures_loaded[j].path.data(),str.C_Str())==0)
+            s>>mtlName;
+        }
+        else if(ltype=="map_Kd")        //an diffuse texture from file 
+        {
+            string texName;
+            s>>texName;
+            bool skip=false;
+            Texture tex;
+            GLuint texID;
+            //search textures to see if this texture has already been loaded
+            for(int i=0;i<texturesLoaded.size();i++)
             {
-                textures.push_back(textures_loaded[j]);
-                skip=true;
-                break;
-            }
-        }
-        // if texture hasn't been loaded already, load it
-        if(!skip)
-        {
-            Texture texture;
-            texture.id = TextureFromFile(str.C_Str(), directory); //load a texture
-            texture.type = typeName;
-            texture.path = str.C_Str();
-            textures.push_back(texture);
-            textures_loaded.push_back(texture);         //add to loaded textures
-        }
+                if(texName==texturesLoaded[i].name)
+                {
+                    texID=texturesLoaded[i].id;
+                    skip=true;
+                    break;
+                }
 
+            }
+            if(!skip)
+                texID=TextureFromFile(texName,this->directory);        //load new texture
+
+            tex.id=texID;
+            tex.name=texName;
+            tex.type="texture_diffuse";
+            tex.mtlName=mtlName;
+            texturesLoaded.push_back(tex);
+        }
+        else if(ltype=="map_Ks")                                    //an ambient texture from file                 
+        {
+            string texName;
+            s>>texName;
+            bool skip=false;
+            Texture tex;
+            GLuint texID;
+            //search textures to see if this texture has already been loaded
+            for(int i=0;i<texturesLoaded.size();i++)
+            {
+                if(texName==texturesLoaded[i].name)
+                {
+                    texID=texturesLoaded[i].id;
+                    skip=true;
+                    break;
+                }
+
+            }
+            if(!skip)
+                texID=TextureFromFile(texName,this->directory);        //load new texture
+
+            tex.id=texID;
+            tex.name=texName;
+            tex.type="texture_specular";
+            tex.mtlName=mtlName;
+            texturesLoaded.push_back(tex);
+        }
+        else if(ltype=="map_Bump")                                    //an ambient texture from file                 
+        {
+            string texName;
+            s>>texName;
+            bool skip=false;
+            Texture tex;
+            GLuint texID;
+            //search textures to see if this texture has already been loaded
+            for(int i=0;i<texturesLoaded.size();i++)
+            {
+                if(texName==texturesLoaded[i].name)
+                {
+                    texID=texturesLoaded[i].id;
+                    skip=true;
+                    break;
+                }
+
+            }
+            if(!skip)
+                texID=TextureFromFile(texName,this->directory);        //load new texture
+
+            tex.id=texID;
+            tex.name=texName;
+            tex.type="texture_height";
+            tex.mtlName=mtlName;
+            texturesLoaded.push_back(tex);
+        }
+        else if(line[0]=='#')                   //comment line
+        {
+
+        }
     }
 
-    return textures;
-
+    this->texturesLoaded=texturesLoaded;
 }
 
-unsigned int Model::TextureFromFile(const char *path, const string &directory)
-{
-    string filename = string(path);
-    filename = directory + '/' + filename;
 
-    unsigned int textureID;
+
+//load a texture from file
+GLuint Model::TextureFromFile(string textureName, string directory)
+{
+    string path= directory + '/' + textureName;
+
+    GLuint textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {
         GLenum format;
@@ -222,10 +426,106 @@ unsigned int Model::TextureFromFile(const char *path, const string &directory)
     }
     else
     {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
+        std::cout << "Model$ Texture failed to load at path: " << path << std::endl;
         stbi_image_free(data);
     }
 
     return textureID;
+}
+
+
+void Model::CopyMeshData(void)
+{
+    GLuint* map = (GLuint*)malloc(sizeof(GLuint) * (this->verCoords.size()));
+    //loop through each mesh in the Model
+    for(int i=0;i<this->meshes.size();i++)
+    {
+        vector<Vertex>       vertices;      //store mesh's vertex data
+        vector<unsigned int> indices;       //store mesh's vertex indices
+        unsigned int index=0;
+        //map from vertex coordinate index to vertex index in a mesh
+        for (int i = 0; i < this->verCoords.size(); i++)                           //initialize map
+        {
+            map[i] = NOT_A_INDEX;
+        }
+
+        Mesh mesh=this->meshes[i];      //get one mesh
+        for(int j=0;j<mesh.faces.size();j++)                //process each face
+        {
+            Face face=mesh.faces[j];    //get one face
+            //process vertex1 of the face
+            VertexWithIndex vertexWithIndex1=face.vertex1;
+            if(map[vertexWithIndex1.verCoordIndex]==NOT_A_INDEX)        //the vertex data hasn't yet been stored
+            {
+                Vertex vertex;
+                //get vertex data
+                vertex.verCoord=this->verCoords[vertexWithIndex1.verCoordIndex];
+                vertex.normal=this->normals[vertexWithIndex1.norIndex];
+                vertex.texCoord=this->texCoords[vertexWithIndex1.texCoordIndex];
+                vertices.push_back(vertex);         //store vertex data
+                
+                map[vertexWithIndex1.verCoordIndex]=index;      //update map
+                indices.push_back(index++);         //store vertex index
+            }
+            else                    //already stored the vertex data in the mesh
+            {
+                indices.push_back(map[vertexWithIndex1.verCoordIndex]); //store vertex index
+            }
+
+            //process vertex2 of the face
+            VertexWithIndex vertexWithIndex2=face.vertex2;
+            if(map[vertexWithIndex2.verCoordIndex]==NOT_A_INDEX)        //the vertex data hasn't yet been stored
+            {
+                Vertex vertex;
+                //get vertex data
+                vertex.verCoord=this->verCoords[vertexWithIndex2.verCoordIndex];
+                vertex.normal=this->normals[vertexWithIndex2.norIndex];
+                vertex.texCoord=this->texCoords[vertexWithIndex2.texCoordIndex];
+                vertices.push_back(vertex);         //store vertex data
+                
+                map[vertexWithIndex2.verCoordIndex]=index;      //update map
+                indices.push_back(index++);         //store vertex index
+            }
+            else                    //already stored the vertex data in the mesh
+            {
+                indices.push_back(map[vertexWithIndex2.verCoordIndex]); //store vertex index
+            }
+
+            //process vertex3 of the face
+            VertexWithIndex vertexWithIndex3=face.vertex3;
+            if(map[vertexWithIndex3.verCoordIndex]==NOT_A_INDEX)        //the vertex data hasn't yet been stored
+            {
+                Vertex vertex;
+                //get vertex data
+                vertex.verCoord=this->verCoords[vertexWithIndex3.verCoordIndex];
+                vertex.normal=this->normals[vertexWithIndex3.norIndex];
+                vertex.texCoord=this->texCoords[vertexWithIndex3.texCoordIndex];
+                vertices.push_back(vertex);         //store vertex data
+                
+                map[vertexWithIndex3.verCoordIndex]=index;      //update map
+                indices.push_back(index++);         //store vertex index
+            }
+            else                    //already stored the vertex data in the mesh
+            {
+                indices.push_back(map[vertexWithIndex3.verCoordIndex]); //store vertex index
+            }
+
+
+        }
+
+        this->meshes[i].vertices=vertices;
+        this->meshes[i].indices=indices;
+
+        this->meshes[i].SetupMesh();
+        
+    }
+
+    this->verCoords.clear();
+    this->normals.clear();
+    this->texCoords.clear();
+    delete[] map;
+
+
+
 }
 
