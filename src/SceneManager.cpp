@@ -69,6 +69,7 @@ void SceneManager::drawAll()
 
 	//Traversal commonNodes
 	commonShader->use();
+	
 	commonShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 	commonShader->setVec3("lightPos", 1.2f, 1.0f, 3.0f);
 	commonShader->setVec3("viewPos", camera->Position);
@@ -520,7 +521,9 @@ bool SceneManager::intersect(glm::vec3 camPos,glm::vec3 camDir,glm::vec3 p1,glm:
 
 bool SceneManager::ifCollision(glm::vec3 nxtPos){
 	for (unsigned int i = 0; i < this->commonNodes.size(); i++)
-	{
+	{	if(i==0){
+			printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f;  %.2f %.2f %.2f\n",this->commonNodes[i].NodeAttr.Position[0]-0.5*this->commonNodes[i].NodeAttr.Scale[0],this->commonNodes[i].NodeAttr.Position[1]-0.5*this->commonNodes[i].NodeAttr.Scale[1],this->commonNodes[i].NodeAttr.Position[2]-0.5*this->commonNodes[i].NodeAttr.Scale[2],this->commonNodes[i].NodeAttr.Scale[0],this->commonNodes[i].NodeAttr.Scale[1],this->commonNodes[i].NodeAttr.Scale[2],nxtPos[0],nxtPos[1],nxtPos[2]);
+		}
 		if(this->commonNodes[i].ifCollision(nxtPos)){
 			return true;
 		}
@@ -536,11 +539,46 @@ bool SceneManager::ifCollision(glm::vec3 nxtPos){
 }
 
 bool SceneNode::ifCollision(glm::vec3 nxtPos){
-	if(nxtPos[0]>NodeAttr.Position[0]-0.5*NodeAttr.Scale[0] && nxtPos[0]<NodeAttr.Position[0]+0.5*NodeAttr.Scale[0] &&
-		nxtPos[1]>NodeAttr.Position[1]-0.5*NodeAttr.Scale[1] && nxtPos[1]<NodeAttr.Position[1]+0.5*NodeAttr.Scale[1] &&
-		nxtPos[2]>NodeAttr.Position[2]-0.5*NodeAttr.Scale[2] && nxtPos[2]<NodeAttr.Position[2]+0.5*NodeAttr.Scale[2]
-	)
-		return true;
+	
+	
+	switch(this->type){
+		case _CUBE_:
+			if(nxtPos[0]>NodeAttr.Scale[0]*NodeAttr.Position[0]-1.2*NodeAttr.Scale[0] && nxtPos[0]<NodeAttr.Scale[0]*NodeAttr.Position[0]+1.2*NodeAttr.Scale[0] &&
+			nxtPos[2]>NodeAttr.Scale[1]*NodeAttr.Position[1]-1.2*NodeAttr.Scale[1] && nxtPos[2]<NodeAttr.Scale[1]*NodeAttr.Position[1]+1.2*NodeAttr.Scale[1] &&
+			nxtPos[1]>NodeAttr.Scale[2]*NodeAttr.Position[2]-1.2*NodeAttr.Scale[2] && nxtPos[1]<NodeAttr.Scale[2]*NodeAttr.Position[2]+1.2*NodeAttr.Scale[2])
+				return true;
+			break;
+		case _SPHERE_:
+			if(((NodeAttr.Position[0]*NodeAttr.Scale[0]-nxtPos[0])*(NodeAttr.Position[0]*NodeAttr.Scale[0]-nxtPos[0])+
+				(NodeAttr.Position[1]*NodeAttr.Scale[1]-nxtPos[2])*(NodeAttr.Position[1]*NodeAttr.Scale[1]-nxtPos[2])+
+				(NodeAttr.Position[2]*NodeAttr.Scale[2]-nxtPos[1])*(NodeAttr.Position[2]*NodeAttr.Scale[2]-nxtPos[1])) < (3.0*NodeAttr.Scale[0]*NodeAttr.Scale[0]+0.01))
+				return true;
+			break;
+		case _CYLINDER_:
+			if(nxtPos[0]>NodeAttr.Scale[0]*NodeAttr.Position[0]-1.5*NodeAttr.Scale[0] && nxtPos[0]<NodeAttr.Scale[0]*NodeAttr.Position[0]+1.5*NodeAttr.Scale[0] &&
+			nxtPos[2]>NodeAttr.Scale[1]*NodeAttr.Position[1]-1.5*NodeAttr.Scale[1] && nxtPos[2]<NodeAttr.Scale[1]*NodeAttr.Position[1]+1.5*NodeAttr.Scale[1] &&
+			nxtPos[1]>NodeAttr.Scale[2]*NodeAttr.Position[2]-1.5*NodeAttr.Scale[2] && nxtPos[1]<NodeAttr.Scale[2]*NodeAttr.Position[2]+1.5*NodeAttr.Scale[2])
+				return true;
+			break;
+		case _CONE_:
+			if(nxtPos[0]>NodeAttr.Scale[0]*NodeAttr.Position[0]-1.5*NodeAttr.Scale[0] && nxtPos[0]<NodeAttr.Scale[0]*NodeAttr.Position[0]+1.5*NodeAttr.Scale[0] &&
+			nxtPos[2]>NodeAttr.Scale[1]*NodeAttr.Position[1]-1.5*NodeAttr.Scale[1] && nxtPos[2]<NodeAttr.Scale[1]*NodeAttr.Position[1]+1.5*NodeAttr.Scale[1] &&
+			nxtPos[1]>NodeAttr.Scale[2]*NodeAttr.Position[2]-1.5*NodeAttr.Scale[2] && nxtPos[1]<NodeAttr.Scale[2]*NodeAttr.Position[2]+1.5*NodeAttr.Scale[2])
+				return true;
+			break;
+		case _FRUSTUM_:
+			if(nxtPos[0]>NodeAttr.Scale[0]*NodeAttr.Position[0]-1.5*NodeAttr.Scale[0] && nxtPos[0]<NodeAttr.Scale[0]*NodeAttr.Position[0]+1.5*NodeAttr.Scale[0] &&
+			nxtPos[2]>NodeAttr.Scale[1]*NodeAttr.Position[1]-1.5*NodeAttr.Scale[1] && nxtPos[2]<NodeAttr.Scale[1]*NodeAttr.Position[1]+1.5*NodeAttr.Scale[1] &&
+			nxtPos[1]>NodeAttr.Scale[2]*NodeAttr.Position[2]-1.5*NodeAttr.Scale[2] && nxtPos[1]<NodeAttr.Scale[2]*NodeAttr.Position[2]+1.5*NodeAttr.Scale[2])
+				return true;
+			break;
+		case _PYRAMID_:
+			if(nxtPos[0]>NodeAttr.Scale[0]*NodeAttr.Position[0]-1.5*NodeAttr.Scale[0] && nxtPos[0]<NodeAttr.Scale[0]*NodeAttr.Position[0]+1.5*NodeAttr.Scale[0] &&
+			nxtPos[2]>NodeAttr.Scale[1]*NodeAttr.Position[1]-1.5*NodeAttr.Scale[1] && nxtPos[2]<NodeAttr.Scale[1]*NodeAttr.Position[1]+1.5*NodeAttr.Scale[1] &&
+			nxtPos[1]>NodeAttr.Scale[2]*NodeAttr.Position[2]-1.5*NodeAttr.Scale[2] && nxtPos[1]<NodeAttr.Scale[2]*NodeAttr.Position[2]+1.5*NodeAttr.Scale[2])
+				return true;
+			break;
+	}
 	return false;
 }
 

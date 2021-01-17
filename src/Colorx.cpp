@@ -192,6 +192,11 @@ void Colorx::initScene()
 	transform.Position = glm::vec3(8,0,-5);
 	transform.FaceNum = 4;
 	smgr->addPyramidNode(transform, true, smgr->BrickTex);
+
+	transform.Position = glm::vec3(0,0,-15);
+	transform.Scale = glm::vec3(25,25,0.1);
+	transform.Color = glm::vec3(1.0);
+	smgr->addCubeNode(transform, true, smgr->WoodTex);
 	
 	#ifndef __APPLE__
 	smgr->addMeshSceneNode("../resource/nanosuit/nanosuit.obj");
