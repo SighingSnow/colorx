@@ -14,9 +14,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
 #include "Mesh.h"
 
 
@@ -24,26 +24,38 @@ class Model
 {   
 
 public:
-    inline Model(const std::string &path){
+    //model data
+    vector<glm::vec3>   verCoords;          //vertex coordinates data
+    vector<glm::vec2>   texCoords;          //texture coordinates data
+    vector<glm::vec3>   normals;            //normal data
+
+
+    vector<Texture>     texturesLoaded;           //textures data
+    std::vector<Mesh> meshes;               //meshes
+
+    std::string directory;                  //model directory
+    std::string modelName;                  //model name
+
+    Shader* shader;
+
+    //constructor
+    Model(const std::string path){
+        //printf("In Model constructor\n");
+        modelName=path.substr(path.rfind('/')+1);
+        directory=path.substr(0,path.rfind('/'));
         loadModel(path);
+        CopyMeshData();
     }
     void Draw(Shader &shader);
     
 private:
-    //model data
-    std::string directory;
-    //std::vector<Texture> textures;
-    std::vector<Texture> textures_loaded;   // stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-    std::vector<Mesh> meshes;
-    Shader* shader;
 
-    void loadModel(std::string path);
-    void processNode(aiNode *node, const aiScene *scene);
-    Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 
-    std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName);
-
-    unsigned int TextureFromFile(const char *path, const string &directory);
+    void loadModel(std::string modelPath);
+    void GenNormals(Mesh &mesh);
+    void loadMaterial(string materialPath);
+    GLuint TextureFromFile(string textureName, string directory);
+    void CopyMeshData(void);
 
 };
 
