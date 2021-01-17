@@ -21,6 +21,7 @@ enum shader_type
 {
     ordinary_type,
     mesh_type,
+	skybox_type,
     light_type
 };
 
@@ -102,5 +103,25 @@ static const char *meshNodeFShader = "#version 330 core\n"
     "{\n"
     "   FragColor = texture(texture_diffuse1,TexCoords);\n"
     "}\n\0";
+
+static const char *skyboxVShader = "#version 330 core\n"
+	"layout (location = 0) in vec3 aPos;\n"
+	"out vec3 TexCoords;\n"
+	"uniform mat4 projection;\n"
+	"uniform mat4 view;\n"
+	"void main()\n"
+	"{\n"
+	"	TexCoords = aPos;\n"
+	"	vec4 pos = projection * view * vec4(aPos, 1.0);\n"
+	"	gl_Position = pos.xyww;\n"
+	"}\n\0";
+static const char *skyboxFShader = "#version 330 core\n"
+	"out vec4 FragColor;\n"
+	"in vec3 TexCoords;\n"
+	"uniform samplerCube skybox;\n"
+	"void main()\n"
+	"{\n"
+	"	FragColor = texture(skybox, TexCoords);\n"
+	"}\n\0";
 
 #endif

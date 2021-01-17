@@ -13,7 +13,7 @@
 /* This is just a test */
 void SceneManager::addMeshSceneNode(SceneManager *smgr, const char* path)
 {
-	Model ourModel("./resource/nanosuit/nanosuit.obj");
+	Model ourModel(path);
 	meshNodes.push_back(ourModel);
 }
 
@@ -41,6 +41,16 @@ void SceneNode::draw(Shader &shader)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+void Skybox::draw()
+{
+	glDisable(GL_CULL_FACE);
+	glBindVertexArray(VAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthFunc(GL_LESS); // set depth function back to default
+}
 
 //	Traversal every nodes in our SceneManager and draw them.
 void SceneManager::drawAll()
@@ -48,15 +58,40 @@ void SceneManager::drawAll()
 	if(wire)	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	//Traversal commonNodes
+	commonShader->use();
+	commonShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	commonShader->setVec3("lightPos", 1.2f, 1.0f, 3.0f);
+	commonShader->setVec3("viewPos", camera->Position);
+	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = camera->GetViewMatrix();
+	commonShader->setMat4("projection", projection);
+	commonShader->setMat4("view", view);
 	for (unsigned int i = 0; i < this->commonNodes.size() ; i++)
 	{
 		if(commonNodes[i].NodeAttr.isAlive == true){
 			this->commonNodes[i].draw(*(this->commonShader));
 		}
 	}
+
+	//Traversal meshNodes
+	meshShader->use();
+	meshShader->setMat4("projection", projection);
+	meshShader->setMat4("view", view);
+	glm::mat4 model = glm::mat4(1.0);
+	meshShader->setMat4("model", model);
 	for(unsigned int i = 0; i < this->meshNodes.size(); i++){
 		this->meshNodes[i].Draw(*(this->meshShader));
 	}
+
+	//draw Skybox
+	glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
+	skyboxShader->use();
+	skyboxShader->setInt("skybox", 0);
+	view = glm::mat4(glm::mat3(camera->GetViewMatrix())); // remove translation from the view matrix
+	skyboxShader->setMat4("view", view);
+	skyboxShader->setMat4("projection", projection);
+	this->ourSkybox.draw();
 }
 
 
@@ -502,6 +537,7 @@ unsigned int SceneManager::loadTexture(char const * path)
 	glGenTextures(1, &textureID);
 
 	int width, height, nrComponents;
+	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
 	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
 	if (data)
 	{
@@ -531,4 +567,35 @@ unsigned int SceneManager::loadTexture(char const * path)
 	}
 
 	return textureID;
+}
+
+unsigned int SceneManager::loadCubemap(vector<std::string> faces)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }

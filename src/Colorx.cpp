@@ -191,12 +191,8 @@ void Colorx::initScene()
 	transform.Position = glm::vec3(8,0,-5);
 	transform.FaceNum = 4;
 	smgr->addPyramidNode(smgr, transform, true, smgr->BrickTex);
-    // std::cout<<smgr->commonNodes.size()<<std::endl;
-    // std::cout<<smgr->commonNodes[0].type<<std::endl;
-    //smgr->addMeshSceneNode(smgr,"resourse/nanosuit",unPickable);
-    ///std::cout<<smgr->commonNodes[0].<<std::endl;
-    // smgr->addConeNode(smgr,glm::vec3(1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
-    // smgr->addConeNode(smgr,glm::vec3(-1.0,0,0),0.0f,glm::vec3(0,0,0),glm::vec3(1,1,1),unPickable);
+	
+	// smgr->addMeshSceneNode(smgr, "../resource/nanosuit/nanosuit.obj");
 }
 
 void Colorx::run()
@@ -209,21 +205,6 @@ void Colorx::run()
         
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        smgr->commonShader->use();
-        // smgr->meshShader->use();
-        smgr->commonShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		smgr->commonShader->setVec3("lightPos", 1.2f, 1.0f, 3.0f);
-		smgr->commonShader->setVec3("viewPos", smgr->camera->Position);
-		
-        glm::mat4 projection = glm::perspective(glm::radians(smgr->camera->Zoom),(float)SCR_WIDTH/SCR_HEIGHT,0.1f,100.0f);
-        glm::mat4 view = smgr->camera->GetViewMatrix();
-        smgr->commonShader->setMat4("projection",projection);
-        smgr->commonShader->setMat4("view",view);
-        
-        // smgr->meshShader->setMat4("projection", projection);
-        // smgr->meshShader->setMat4("view", view);
-        // smgr->meshShader->setMat4("model", model);
 
         smgr->drawAll();
 

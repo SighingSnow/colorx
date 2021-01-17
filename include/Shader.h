@@ -36,6 +36,12 @@ public:
                 glShaderSource(fragment, 1, &meshNodeFShader, NULL);
                 break;
             }
+			case skybox_type:
+			{
+				glShaderSource(vertex, 1, &skyboxVShader, NULL);
+				glShaderSource(fragment, 1, &skyboxFShader, NULL);
+				break;
+			}
         }
 
         glCompileShader(vertex);

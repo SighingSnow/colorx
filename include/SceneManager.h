@@ -155,6 +155,80 @@ private:
 	}
 };
 
+class Skybox
+{
+public:
+	unsigned int textureID;
+	inline Skybox(unsigned int TextureID){
+		textureID = TextureID;
+		setUpSkybox();
+	}
+
+	void draw();
+
+	Skybox(){};
+	~Skybox(){};
+
+private:
+	unsigned int VAO,VBO;
+	float skyboxVertices[108] = {
+		// positions
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f};
+	
+	void setUpSkybox()
+	{
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glBindVertexArray(0);
+	}
+};
+
+
 class SceneManager
 {
 public:
@@ -162,6 +236,8 @@ public:
 	Camera* camera;
 	Shader* commonShader;
 	Shader* meshShader;
+	Shader* skyboxShader;
+	Skybox ourSkybox;
 	std::vector<Model> meshNodes;
 	std::vector<Light> lights;
 	std::vector<SceneNode> commonNodes;
@@ -173,11 +249,15 @@ public:
 	unsigned int WoodTex = loadTexture("../resource/texture_image/wood.png");
 	unsigned int BrickTex = loadTexture("../resource/texture_image/brick.png");
 
+	unsigned int skyboxTex = loadCubemap(Faces);
+
 	inline SceneManager(GLFWwindow* mywindow){
 		window = mywindow;
 		commonShader = new Shader(ordinary_type);
 		meshShader = new Shader(mesh_type);
+		skyboxShader = new Shader(skybox_type);
 		camera = new Camera(glm::vec3(0.0f,0.0f,3.0f));
+		ourSkybox = *new Skybox(skyboxTex);
 	};
 
 	void addMeshSceneNode(SceneManager *smgr, const char* path );
@@ -206,15 +286,24 @@ public:
 	/* auto save to current dir */
 	void prtScreen();
 
-	unsigned int loadTexture(char const * path);
-
 	bool intersect(glm::vec3 camPos,glm::vec3 camDir,glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,float& t,float& u,float& v);
 	bool ifCollision(glm::vec3 nxtPos);
 
-	~SceneManager();
+	~SceneManager(){};
 
 private:
+	unsigned int loadTexture(char const * path);
+	unsigned int loadCubemap(vector<std::string> faces);
 	
+	vector<std::string> Faces
+    {
+        "../resource/skybox/right.jpg",
+        "../resource/skybox/left.jpg",
+        "../resource/skybox/top.jpg",
+        "../resource/skybox/bottom.jpg",
+        "../resource/skybox/front.jpg",
+        "../resource/skybox/back.jpg"
+    };
 };
 
 #endif
