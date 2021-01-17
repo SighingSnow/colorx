@@ -243,13 +243,20 @@ public:
 	std::vector<SceneNode> commonNodes;
 
 	bool wire = false;
-
+#ifndef __APPLE__
 	unsigned int StoneTex = loadTexture("../resource/texture_image/stone.png");
 	unsigned int ObsidianTex = loadTexture("../resource/texture_image/obsidian.png");
 	unsigned int WoodTex = loadTexture("../resource/texture_image/wood.png");
 	unsigned int BrickTex = loadTexture("../resource/texture_image/brick.png");
+#endif
 
-	unsigned int skyboxTex = loadCubemap(Faces);
+#ifdef __APPLE__
+	unsigned int StoneTex = loadTexture("resource/texture_image/stone.png");
+	unsigned int ObsidianTex = loadTexture("resource/texture_image/obsidian.png");
+	unsigned int WoodTex = loadTexture("resource/texture_image/wood.png");
+	unsigned int BrickTex = loadTexture("resource/texture_image/brick.png");
+#endif
+	unsigned int skyboxTex ;
 
 	inline SceneManager(GLFWwindow* mywindow){
 		window = mywindow;
@@ -257,6 +264,7 @@ public:
 		meshShader = new Shader(mesh_type);
 		skyboxShader = new Shader(skybox_type);
 		camera = new Camera(glm::vec3(0.0f,0.0f,3.0f));
+		skyboxTex = loadCubemap(Faces);
 		ourSkybox = *new Skybox(skyboxTex);
 	};
 
@@ -294,16 +302,31 @@ public:
 private:
 	unsigned int loadTexture(char const * path);
 	unsigned int loadCubemap(vector<std::string> faces);
-	
+
+#ifndef __APPLE__
 	vector<std::string> Faces
     {
         "../resource/skybox/right.jpg",
         "../resource/skybox/left.jpg",
+		"../resource/skybox/bottom.jpg",
         "../resource/skybox/top.jpg",
-        "../resource/skybox/bottom.jpg",
         "../resource/skybox/front.jpg",
         "../resource/skybox/back.jpg"
     };
+#endif
+
+#ifdef __APPLE__
+	vector<std::string> Faces
+    {
+        "resource/skybox/right.jpg",
+        "resource/skybox/left.jpg",
+		"resource/skybox/bottom.jpg",
+        "resource/skybox/top.jpg",
+        "resource/skybox/front.jpg",
+        "resource/skybox/back.jpg"
+    };
+#endif
+
 };
 
 #endif

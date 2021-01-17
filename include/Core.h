@@ -111,7 +111,7 @@ static const char *skyboxVShader = "#version 330 core\n"
 	"uniform mat4 view;\n"
 	"void main()\n"
 	"{\n"
-	"	TexCoords = aPos;\n"
+	"TexCoords = vec3(aPos.x, -aPos.y, aPos.z);\n"
 	"	vec4 pos = projection * view * vec4(aPos, 1.0);\n"
 	"	gl_Position = pos.xyww;\n"
 	"}\n\0";
