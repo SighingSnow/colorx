@@ -1,5 +1,6 @@
 #include "../include/EventHandler.h"
 bool firstMouse = false;
+bool focused = true;
 float lastX = SCR_WIDTH / 2;
 float lastY = SCR_HEIGHT / 2;
 
@@ -21,6 +22,12 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
     {      
         eventer->smgr->camera->ChangeGOD();
+    }
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {      
+        focused = !focused;
+		if(focused)		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		else			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
     if(glfwGetKey(window,GLFW_KEY_Q) == GLFW_PRESS){
         /* change the cube */
@@ -161,7 +168,7 @@ void mouse_button_callback(GLFWwindow* window,int button, int action, int mods)
             //std::cout<<"[ORIGIN]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
             tAttr.Position +=  faceNorm;
             //std::cout<<"[RESULT]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
-            eventer->smgr->addCubeNode(eventer->smgr,tAttr,tTex,tTexID);
+            eventer->smgr->addCubeNode(tAttr,tTex,tTexID);
         }
         
     }
@@ -220,7 +227,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    eventer->smgr->camera->ProcessMouseMovement(xoffset, yoffset);
+    if(focused)
+		eventer->smgr->camera->ProcessMouseMovement(xoffset, yoffset);
 
     return;
 }

@@ -11,7 +11,7 @@
 /*	Class SceneNode's constructor and draw(Shader &shader) function
  */
 /* This is just a test */
-void SceneManager::addMeshSceneNode(SceneManager *smgr, const char* path)
+void SceneManager::addMeshSceneNode(const char* path)
 {
 	Model ourModel(path);
 	meshNodes.push_back(ourModel);
@@ -52,6 +52,15 @@ void Skybox::draw()
 	glDepthFunc(GL_LESS); // set depth function back to default
 }
 
+void Cross::draw()
+{
+	glDisable(GL_CULL_FACE);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 12);
+	glBindVertexArray(0);
+	glDepthFunc(GL_LESS);
+}
+
 //	Traversal every nodes in our SceneManager and draw them.
 void SceneManager::drawAll()
 {
@@ -63,7 +72,7 @@ void SceneManager::drawAll()
 	commonShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 	commonShader->setVec3("lightPos", 1.2f, 1.0f, 3.0f);
 	commonShader->setVec3("viewPos", camera->Position);
-	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)wWidth / wHeight, 0.1f, 100.0f);
 	glm::mat4 view = camera->GetViewMatrix();
 	commonShader->setMat4("projection", projection);
 	commonShader->setMat4("view", view);
@@ -87,11 +96,17 @@ void SceneManager::drawAll()
 	//draw Skybox
 	glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
 	skyboxShader->use();
-	skyboxShader->setInt("skybox", 0);
 	view = glm::mat4(glm::mat3(camera->GetViewMatrix())); // remove translation from the view matrix
 	skyboxShader->setMat4("view", view);
 	skyboxShader->setMat4("projection", projection);
 	this->ourSkybox.draw();
+	
+	//draw cross
+	glDepthFunc(GL_ALWAYS);
+	crossShader->use();
+	glm::vec2 scrCoeff = glm::vec2((50.0f / (float)wWidth), (50.0f / (float)wHeight));
+	crossShader->setVec2("scrCoeff", scrCoeff);
+	ourCross.draw();
 }
 
 
@@ -100,7 +115,7 @@ void SceneManager::drawAll()
  *	One requires no transformation parameters in input.
  *	The other one requires them.
  */
-void SceneManager::addCubeNode(SceneManager *smgr, bool Texture, unsigned int TextureID)
+void SceneManager::addCubeNode(bool Texture, unsigned int TextureID)
 {
 	
 	SceneNode* Node = new SceneNode(_CUBE_, Texture, TextureID);
@@ -110,7 +125,7 @@ void SceneManager::addCubeNode(SceneManager *smgr, bool Texture, unsigned int Te
 	delete Node;
 }
 
-void SceneManager::addCubeNode(SceneManager *smgr, transAttr transform, bool Texture, unsigned int TextureID)
+void SceneManager::addCubeNode(transAttr transform, bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(transform, _CUBE_, Texture, TextureID);
 
@@ -119,7 +134,7 @@ void SceneManager::addCubeNode(SceneManager *smgr, transAttr transform, bool Tex
 	delete Node;
 }
 
-void SceneManager::addSphereNode(SceneManager *smgr, bool Texture, unsigned int TextureID)
+void SceneManager::addSphereNode(bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(_SPHERE_, Texture, TextureID);
 
@@ -128,7 +143,7 @@ void SceneManager::addSphereNode(SceneManager *smgr, bool Texture, unsigned int 
 	delete Node;
 }
 
-void SceneManager::addSphereNode(SceneManager *smgr, transAttr transform, bool Texture, unsigned int TextureID)
+void SceneManager::addSphereNode(transAttr transform, bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(transform, _SPHERE_, Texture, TextureID);
 
@@ -137,7 +152,7 @@ void SceneManager::addSphereNode(SceneManager *smgr, transAttr transform, bool T
 	delete Node;
 }
 
-void SceneManager::addCylinderNode(SceneManager *smgr, bool Texture, unsigned int TextureID)
+void SceneManager::addCylinderNode(bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(_CYLINDER_, Texture, TextureID);
 
@@ -146,7 +161,7 @@ void SceneManager::addCylinderNode(SceneManager *smgr, bool Texture, unsigned in
 	delete Node;
 }
 
-void SceneManager::addCylinderNode(SceneManager *smgr, transAttr transform, bool Texture, unsigned int TextureID)
+void SceneManager::addCylinderNode(transAttr transform, bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(transform, _CYLINDER_, Texture, TextureID);
 
@@ -155,7 +170,7 @@ void SceneManager::addCylinderNode(SceneManager *smgr, transAttr transform, bool
 	delete Node;
 }
 
-void SceneManager::addConeNode(SceneManager *smgr, bool Texture, unsigned int TextureID)
+void SceneManager::addConeNode(bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(_CONE_, Texture, TextureID);
 
@@ -164,7 +179,7 @@ void SceneManager::addConeNode(SceneManager *smgr, bool Texture, unsigned int Te
 	delete Node;
 }
 
-void SceneManager::addConeNode(SceneManager *smgr, transAttr transform, bool Texture, unsigned int TextureID)
+void SceneManager::addConeNode(transAttr transform, bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(transform, _CONE_, Texture, TextureID);
 
@@ -173,7 +188,7 @@ void SceneManager::addConeNode(SceneManager *smgr, transAttr transform, bool Tex
 	delete Node;
 }
 
-void SceneManager::addFrustumNode(SceneManager *smgr, bool Texture, unsigned int TextureID)
+void SceneManager::addFrustumNode(bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(_FRUSTUM_, Texture, TextureID);
 
@@ -182,7 +197,7 @@ void SceneManager::addFrustumNode(SceneManager *smgr, bool Texture, unsigned int
 	delete Node;
 }
 
-void SceneManager::addFrustumNode(SceneManager *smgr, transAttr transform, bool Texture, unsigned int TextureID)
+void SceneManager::addFrustumNode(transAttr transform, bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(transform, _FRUSTUM_, Texture, TextureID);
 
@@ -191,7 +206,7 @@ void SceneManager::addFrustumNode(SceneManager *smgr, transAttr transform, bool 
 	delete Node;
 }
 
-void SceneManager::addPyramidNode(SceneManager *smgr, bool Texture, unsigned int TextureID)
+void SceneManager::addPyramidNode(bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(_PYRAMID_, Texture, TextureID);
 
@@ -200,7 +215,7 @@ void SceneManager::addPyramidNode(SceneManager *smgr, bool Texture, unsigned int
 	delete Node;
 }
 
-void SceneManager::addPyramidNode(SceneManager *smgr, transAttr transform, bool Texture, unsigned int TextureID)
+void SceneManager::addPyramidNode(transAttr transform, bool Texture, unsigned int TextureID)
 {
 	SceneNode* Node = new SceneNode(transform, _PYRAMID_, Texture, TextureID);
 
@@ -440,9 +455,6 @@ void SceneNode::GenStdFrustum()
 
 void SceneManager::prtScreen()
 {
-	int wWidth, wHeight;
-	glfwGetWindowSize(window, &wWidth, &wHeight);
-
 	time_t rawtime;
 	time(&rawtime);
 	
@@ -454,27 +466,28 @@ void SceneManager::prtScreen()
 	
 	pngname += ".png";
 	
-	GLubyte pixels[wHeight][wWidth][3] ;
+	GLubyte *pixels;
+	pixels = new GLubyte[wHeight*wWidth*3];
 	memset(pixels,0,wHeight*wWidth*3*sizeof(GLubyte));
 
 	glFlush(); glFinish();
 
-	glReadPixels(0, 0, wWidth, wHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	glReadPixels(0, 0, wWidth, wHeight, GL_RGB, GL_UNSIGNED_BYTE, &pixels[0]);
 
 	for (int i = 0; i < wHeight/2; i++)
 		for (int j = 0; j < wWidth; j++)
 			for (int k = 0; k < 3; k++)
 			{
-				GLubyte temp = pixels[i][j][k];
-				pixels[i][j][k] = pixels[wHeight-i-1][j][k];
-				pixels[wHeight-i-1][j][k] = temp;
+				GLubyte temp = pixels[i*wWidth*3 + j*3 + k];
+				pixels[i*wWidth*3 + j*3 + k] = pixels[(wHeight-i-1)*wWidth*3 + j*3 + k];
+				pixels[(wHeight-i-1)*wWidth*3 + j*3 + k] = temp;
 			}
 
     FILE *fp = fopen(pngname.c_str(), "wb+");
-    svpng(fp, wWidth, wHeight, &pixels[0][0][0], 0);
+    svpng(fp, wWidth, wHeight, &pixels[0], 0);
     fclose(fp);
 
-	free(pixels);
+	delete []pixels;
 }
 
 /* imply Trumbore algorithm */
@@ -531,14 +544,14 @@ bool SceneNode::ifCollision(glm::vec3 nxtPos){
 	return false;
 }
 
-unsigned int SceneManager::loadTexture(char const * path)
+unsigned int SceneManager::loadTexture(std::string path)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
 	int width, height, nrComponents;
 	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+	unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
 	if (data)
 	{
 		GLenum format;

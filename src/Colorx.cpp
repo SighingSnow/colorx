@@ -11,6 +11,7 @@ Colorx::Colorx()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
     #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -38,7 +39,7 @@ Colorx::Colorx()
     eventer = new EventHandler(smgr);
 
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -57,142 +58,146 @@ void Colorx::initScene()
 	transform.Ratio = 1;
     transform.pick = isPickable;
     transform.isAlive = true;
-	smgr->addCubeNode(smgr, transform);
+	smgr->addCubeNode(transform);
 	
 	transform.Position = glm::vec3(-4,0,0);
 	transform.Scale = glm::vec3(Minier);
 	transform.Color = glm::vec3(1);
-    smgr->addSphereNode(smgr,transform);
+    smgr->addSphereNode(transform);
 	
 	transform.Position = glm::vec3(-1,0,0);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
 	transform.Color = glm::vec3(0.1,0.8,0.5);
-	smgr->addCylinderNode(smgr, transform);
+	smgr->addCylinderNode(transform);
 	
 	transform.Position = glm::vec3(2,0,0);
 	transform.Color = glm::vec3(1.0,0.0,1.0);
-	smgr->addConeNode(smgr, transform);
+	smgr->addConeNode(transform);
 	
 	transform.Position = glm::vec3(5,0,0);
 	transform.FaceNum = 6;
 	transform.Ratio = 0.5;
 	transform.Color = glm::vec3(1.0,0.0,0.0);
-	smgr->addFrustumNode(smgr, transform);
+	smgr->addFrustumNode(transform);
 	
 	transform.Position = glm::vec3(8,0,0);
 	transform.FaceNum = 4;
 	transform.Color = glm::vec3(1.0,1.0,0.0);
-	smgr->addPyramidNode(smgr, transform);
+	smgr->addPyramidNode(transform);
 
 	//Stone
 	transform.Position = glm::vec3(-7,0,2.5);
 	transform.Scale = glm::vec3(Minier);
 	transform.Color = glm::vec3(1.0);
-	smgr->addCubeNode(smgr, transform, true, smgr->StoneTex);
+	smgr->addCubeNode(transform, true, smgr->StoneTex);
 	
 	transform.Position = glm::vec3(-4,0,2.5);
 	transform.Scale = glm::vec3(Minier);
-    smgr->addSphereNode(smgr,transform, true, smgr->StoneTex);
+    smgr->addSphereNode(transform, true, smgr->StoneTex);
 	
 	transform.Position = glm::vec3(-1,0,2.5);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
 	transform.Ratio = 1;
-	smgr->addCylinderNode(smgr, transform, true, smgr->StoneTex);
+	smgr->addCylinderNode(transform, true, smgr->StoneTex);
 	
 	transform.Position = glm::vec3(2,0,2.5);
-	smgr->addConeNode(smgr, transform, true, smgr->StoneTex);
+	smgr->addConeNode(transform, true, smgr->StoneTex);
 	
 	transform.Position = glm::vec3(5,0,2.5);
 	transform.FaceNum = 6;
 	transform.Ratio = 0.5;
-	smgr->addFrustumNode(smgr, transform, true, smgr->StoneTex);
+	smgr->addFrustumNode(transform, true, smgr->StoneTex);
 	
 	transform.Position = glm::vec3(8,0,2.5);
 	transform.FaceNum = 4;
-	smgr->addPyramidNode(smgr, transform, true, smgr->StoneTex);
+	smgr->addPyramidNode(transform, true, smgr->StoneTex);
 
 	//Obsidian
 	transform.Position = glm::vec3(-7,0,5);
 	transform.Scale = glm::vec3(Minier);
 	transform.Color = glm::vec3(1.0);
-	smgr->addCubeNode(smgr, transform, true, smgr->ObsidianTex);
+	smgr->addCubeNode(transform, true, smgr->ObsidianTex);
 	
 	transform.Position = glm::vec3(-4,0,5);
 	transform.Scale = glm::vec3(Minier);
-    smgr->addSphereNode(smgr,transform, true, smgr->ObsidianTex);
+    smgr->addSphereNode(transform, true, smgr->ObsidianTex);
 	
 	transform.Position = glm::vec3(-1,0,5);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
 	transform.Ratio = 1;
-	smgr->addCylinderNode(smgr, transform, true, smgr->ObsidianTex);
+	smgr->addCylinderNode(transform, true, smgr->ObsidianTex);
 	
 	transform.Position = glm::vec3(2,0,5);
-	smgr->addConeNode(smgr, transform, true, smgr->ObsidianTex);
+	smgr->addConeNode(transform, true, smgr->ObsidianTex);
 	
 	transform.Position = glm::vec3(5,0,5);
 	transform.FaceNum = 6;
 	transform.Ratio = 0.5;
-	smgr->addFrustumNode(smgr, transform, true, smgr->ObsidianTex);
+	smgr->addFrustumNode(transform, true, smgr->ObsidianTex);
 	
 	transform.Position = glm::vec3(8,0,5);
 	transform.FaceNum = 4;
-	smgr->addPyramidNode(smgr, transform, true, smgr->ObsidianTex);
+	smgr->addPyramidNode(transform, true, smgr->ObsidianTex);
 
 	//Wood
 	transform.Position = glm::vec3(-7,0,-2.5);
 	transform.Scale = glm::vec3(Minier);
 	transform.Color = glm::vec3(1.0);
-	smgr->addCubeNode(smgr, transform, true, smgr->WoodTex);
+	smgr->addCubeNode(transform, true, smgr->WoodTex);
 	
 	transform.Position = glm::vec3(-4,0,-2.5);
 	transform.Scale = glm::vec3(Minier);
-    smgr->addSphereNode(smgr,transform, true, smgr->WoodTex);
+    smgr->addSphereNode(transform, true, smgr->WoodTex);
 	
 	transform.Position = glm::vec3(-1,0,-2.5);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
 	transform.Ratio = 1;
-	smgr->addCylinderNode(smgr, transform, true, smgr->WoodTex);
+	smgr->addCylinderNode(transform, true, smgr->WoodTex);
 	
 	transform.Position = glm::vec3(2,0,-2.5);
-	smgr->addConeNode(smgr, transform, true, smgr->WoodTex);
+	smgr->addConeNode(transform, true, smgr->WoodTex);
 	
 	transform.Position = glm::vec3(5,0,-2.5);
 	transform.FaceNum = 6;
 	transform.Ratio = 0.5;
-	smgr->addFrustumNode(smgr, transform, true, smgr->WoodTex);
+	smgr->addFrustumNode(transform, true, smgr->WoodTex);
 	
 	transform.Position = glm::vec3(8,0,-2.5);
 	transform.FaceNum = 4;
-	smgr->addPyramidNode(smgr, transform, true, smgr->WoodTex);
+	smgr->addPyramidNode(transform, true, smgr->WoodTex);
 
 	//Brick
 	transform.Position = glm::vec3(-7,0,-5);
 	transform.Scale = glm::vec3(Minier);
 	transform.Color = glm::vec3(1.0);
-	smgr->addCubeNode(smgr, transform, true, smgr->BrickTex);
+	smgr->addCubeNode(transform, true, smgr->BrickTex);
 	
 	transform.Position = glm::vec3(-4,0,-5);
 	transform.Scale = glm::vec3(Minier);
-    smgr->addSphereNode(smgr,transform, true, smgr->BrickTex);
+    smgr->addSphereNode(transform, true, smgr->BrickTex);
 	
 	transform.Position = glm::vec3(-1,0,-5);
 	transform.Scale = glm::vec3(Minier,Minier,2*Minier);
 	transform.Ratio = 1;
-	smgr->addCylinderNode(smgr, transform, true, smgr->BrickTex);
+	smgr->addCylinderNode(transform, true, smgr->BrickTex);
 	
 	transform.Position = glm::vec3(2,0,-5);
-	smgr->addConeNode(smgr, transform, true, smgr->BrickTex);
+	smgr->addConeNode(transform, true, smgr->BrickTex);
 	
 	transform.Position = glm::vec3(5,0,-5);
 	transform.FaceNum = 6;
 	transform.Ratio = 0.5;
-	smgr->addFrustumNode(smgr, transform, true, smgr->BrickTex);
+	smgr->addFrustumNode(transform, true, smgr->BrickTex);
 	
 	transform.Position = glm::vec3(8,0,-5);
 	transform.FaceNum = 4;
-	smgr->addPyramidNode(smgr, transform, true, smgr->BrickTex);
+	smgr->addPyramidNode(transform, true, smgr->BrickTex);
 	
-	// smgr->addMeshSceneNode(smgr, "../resource/nanosuit/nanosuit.obj");
+	#ifndef __APPLE__
+	smgr->addMeshSceneNode("../resource/nanosuit/nanosuit.obj");
+	#else
+	smgr->addMeshSceneNode("resource/nanosuit/nanosuit.obj");
+	#endif
 }
 
 void Colorx::run()
@@ -201,7 +206,8 @@ void Colorx::run()
         float currentFrame = glfwGetTime();
         eventer->deltaTime = currentFrame - eventer->lastFrame;
         eventer->lastFrame = currentFrame;
-        processInput(window);
+        glfwGetWindowSize(smgr->window, &smgr->wWidth, &smgr->wHeight);
+		processInput(window);
         
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

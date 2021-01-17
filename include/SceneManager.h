@@ -143,13 +143,13 @@ private:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,indices.size()*sizeof(unsigned int),&indices[0],GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stepWidth*sizeof(float), (void*)0);
         
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stepWidth*sizeof(float), (void*)(3*sizeof(float)));
 		
 		glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stepWidth*sizeof(float), (void*)(6*sizeof(float)));
 		
 		glBindVertexArray(0);
 	}
@@ -228,6 +228,48 @@ private:
 	}
 };
 
+class Cross
+{
+public:
+	inline Cross(){
+		setUpCross();
+	}
+	
+	void draw();
+	
+	~Cross(){};
+private:
+	unsigned int VAO,VBO;
+	float crossVertices[60] = {
+		-1.0,   0.0,	1.0, 0.0, 1.0,
+		 0.0, -0.08,	0.0, 1.0, 1.0,
+		 0.0,  0.08,	1.0, 1.0, 0.0,
+		
+		 1.0,   0.0,	1.0, 1.0, 0.0,
+		 0.0,  0.08,	1.0, 1.0, 0.0,
+		 0.0, -0.08,	0.0, 1.0, 1.0,
+		
+		  0.0, -1.0,	0.0, 1.0, 1.0,
+		 0.08,  0.0,	1.0, 1.0, 0.0,
+		-0.08,  0.0,	1.0, 0.0, 1.0,
+		
+		  0.0,  1.0,	1.0, 0.0, 0.0,
+		-0.08,  0.0,	1.0, 0.0, 1.0,
+		 0.08,  0.0,	1.0, 1.0, 0.0};
+	void setUpCross()
+	{
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(crossVertices), &crossVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2*sizeof(float)));
+		glBindVertexArray(0);
+	}
+};
 
 class SceneManager
 {
@@ -237,56 +279,60 @@ public:
 	Shader* commonShader;
 	Shader* meshShader;
 	Shader* skyboxShader;
+	Shader* crossShader;
+	Cross ourCross;
 	Skybox ourSkybox;
 	std::vector<Model> meshNodes;
 	std::vector<Light> lights;
 	std::vector<SceneNode> commonNodes;
 
 	bool wire = false;
-#ifndef __APPLE__
-	unsigned int StoneTex = loadTexture("../resource/texture_image/stone.png");
-	unsigned int ObsidianTex = loadTexture("../resource/texture_image/obsidian.png");
-	unsigned int WoodTex = loadTexture("../resource/texture_image/wood.png");
-	unsigned int BrickTex = loadTexture("../resource/texture_image/brick.png");
-#endif
 
-#ifdef __APPLE__
-	unsigned int StoneTex = loadTexture("resource/texture_image/stone.png");
-	unsigned int ObsidianTex = loadTexture("resource/texture_image/obsidian.png");
-	unsigned int WoodTex = loadTexture("resource/texture_image/wood.png");
-	unsigned int BrickTex = loadTexture("resource/texture_image/brick.png");
-#endif
-	unsigned int skyboxTex ;
+	int wWidth, wHeight;
+
+	unsigned int StoneTex,
+				 ObsidianTex,
+				 WoodTex,
+				 BrickTex;
+
+	unsigned int skyboxTex;
 
 	inline SceneManager(GLFWwindow* mywindow){
 		window = mywindow;
 		commonShader = new Shader(ordinary_type);
 		meshShader = new Shader(mesh_type);
 		skyboxShader = new Shader(skybox_type);
+		crossShader = new Shader(cross_type);
 		camera = new Camera(glm::vec3(0.0f,0.0f,3.0f));
+		StoneTex = loadTexture(StonePath);
+		ObsidianTex = loadTexture(ObsidianPath);
+		WoodTex = loadTexture(WoodPath);
+		BrickTex = loadTexture(BrickPath);
 		skyboxTex = loadCubemap(Faces);
 		ourSkybox = *new Skybox(skyboxTex);
+		ourCross = *new Cross();
+		glfwGetWindowSize(window, &wWidth, &wHeight);
 	};
 
-	void addMeshSceneNode(SceneManager *smgr, const char* path );
+	void addMeshSceneNode(const char* path );
 
-	void addCubeNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
-	void addCubeNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
+	void addCubeNode(bool Texture = false, unsigned int TextureID = 0);
+	void addCubeNode(transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addSphereNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
-	void addSphereNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
+	void addSphereNode(bool Texture = false, unsigned int TextureID = 0);
+	void addSphereNode(transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addCylinderNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
-	void addCylinderNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
+	void addCylinderNode(bool Texture = false, unsigned int TextureID = 0);
+	void addCylinderNode(transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addConeNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
-	void addConeNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
+	void addConeNode(bool Texture = false, unsigned int TextureID = 0);
+	void addConeNode(transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addFrustumNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
-	void addFrustumNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
+	void addFrustumNode(bool Texture = false, unsigned int TextureID = 0);
+	void addFrustumNode(transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
-	void addPyramidNode(SceneManager *smgr, bool Texture = false, unsigned int TextureID = 0);
-	void addPyramidNode(SceneManager *smgr, transAttr transform, bool Texture = false, unsigned int TextureID = 0);
+	void addPyramidNode(bool Texture = false, unsigned int TextureID = 0);
+	void addPyramidNode(transAttr transform, bool Texture = false, unsigned int TextureID = 0);
 
 	/* draw all the meshNodes and Nodes */
 	void drawAll();
@@ -300,10 +346,15 @@ public:
 	~SceneManager(){};
 
 private:
-	unsigned int loadTexture(char const * path);
+	unsigned int loadTexture(std::string path);
 	unsigned int loadCubemap(vector<std::string> faces);
 
 #ifndef __APPLE__
+	std::string StonePath = "../resource/texture_image/stone.png",
+				ObsidianPath = "../resource/texture_image/obsidian.png",
+				WoodPath = "../resource/texture_image/wood.png",
+				BrickPath = "../resource/texture_image/brick.png";
+	
 	vector<std::string> Faces
     {
         "../resource/skybox/right.jpg",
@@ -313,9 +364,12 @@ private:
         "../resource/skybox/front.jpg",
         "../resource/skybox/back.jpg"
     };
-#endif
-
-#ifdef __APPLE__
+#else
+	std::string StonePath = "resource/texture_image/stone.png",
+				ObsidianPath = "resource/texture_image/obsidian.png",
+				WoodPath = "resource/texture_image/wood.png",
+				BrickPath = "resource/texture_image/brick.png";
+	
 	vector<std::string> Faces
     {
         "resource/skybox/right.jpg",

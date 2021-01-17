@@ -22,6 +22,7 @@ enum shader_type
     ordinary_type,
     mesh_type,
 	skybox_type,
+	cross_type,
     light_type
 };
 
@@ -111,7 +112,7 @@ static const char *skyboxVShader = "#version 330 core\n"
 	"uniform mat4 view;\n"
 	"void main()\n"
 	"{\n"
-	"TexCoords = vec3(aPos.x, -aPos.y, aPos.z);\n"
+	"	TexCoords = vec3(aPos.x, -aPos.y, aPos.z);\n"
 	"	vec4 pos = projection * view * vec4(aPos, 1.0);\n"
 	"	gl_Position = pos.xyww;\n"
 	"}\n\0";
@@ -123,5 +124,24 @@ static const char *skyboxFShader = "#version 330 core\n"
 	"{\n"
 	"	FragColor = texture(skybox, TexCoords);\n"
 	"}\n\0";
+
+static const char *crossVShader = "#version 330 core\n"
+    "layout (location = 0) in vec2 aPos;\n"
+	"layout (location = 1) in vec3 aColor;\n"
+	"out vec3 Color;\n"
+	"uniform vec2 scrCoeff;\n"
+    "void main()\n"
+    "{\n"
+	"	Color = aColor;\n"
+	"	vec2 pos = scrCoeff * aPos;\n"
+    "   gl_Position = vec4(pos, 0.0, 1.0);\n"
+    "}\0";
+static const char *crossFShader = "#version 330 core\n"
+	"in vec3 Color;\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(Color, 0.2);\n"
+    "}\n\0";
 
 #endif

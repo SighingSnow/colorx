@@ -42,6 +42,12 @@ public:
 				glShaderSource(fragment, 1, &skyboxFShader, NULL);
 				break;
 			}
+			case cross_type:
+			{
+				glShaderSource(vertex, 1, &crossVShader, NULL);
+				glShaderSource(fragment, 1, &crossFShader, NULL);
+				break;
+			}
         }
 
         glCompileShader(vertex);
