@@ -16,3 +16,6 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 glfw_config.h
+glfw3.pc
+glfw3Config.cmake
+cmake_uninstall.cmake
