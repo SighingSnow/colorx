@@ -17,6 +17,7 @@ extern float lastY;
 extern glm::vec3 velocity;        //垂直方向速度
 extern glm::vec3 gravity;         //重力加速度
 extern glm::vec3 accelerUp; 
+extern int state; 
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
