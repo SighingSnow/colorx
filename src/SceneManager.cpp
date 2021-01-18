@@ -71,8 +71,9 @@ void SceneManager::drawAll()
 	commonShader->use();
 	
 	commonShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	commonShader->setVec3("lightPos", 1.2f, 1.0f, 3.0f);
+	commonShader->setVec3("lightPos", nodeLight->position);
 	commonShader->setVec3("viewPos", camera->Position);
+	commonShader->setFloat("ambientStrength",nodeLight->strength);
 	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)wWidth / wHeight, 0.1f, 100.0f);
 	glm::mat4 view = camera->GetViewMatrix();
 	commonShader->setMat4("projection", projection);
@@ -522,7 +523,7 @@ bool SceneManager::intersect(glm::vec3 camPos,glm::vec3 camDir,glm::vec3 p1,glm:
 bool SceneManager::ifCollision(glm::vec3 nxtPos){
 	for (unsigned int i = 0; i < this->commonNodes.size(); i++)
 	{	if(i==0){
-			printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f;  %.2f %.2f %.2f\n",this->commonNodes[i].NodeAttr.Position[0]-0.5*this->commonNodes[i].NodeAttr.Scale[0],this->commonNodes[i].NodeAttr.Position[1]-0.5*this->commonNodes[i].NodeAttr.Scale[1],this->commonNodes[i].NodeAttr.Position[2]-0.5*this->commonNodes[i].NodeAttr.Scale[2],this->commonNodes[i].NodeAttr.Scale[0],this->commonNodes[i].NodeAttr.Scale[1],this->commonNodes[i].NodeAttr.Scale[2],nxtPos[0],nxtPos[1],nxtPos[2]);
+			//printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f;  %.2f %.2f %.2f\n",this->commonNodes[i].NodeAttr.Position[0]-0.5*this->commonNodes[i].NodeAttr.Scale[0],this->commonNodes[i].NodeAttr.Position[1]-0.5*this->commonNodes[i].NodeAttr.Scale[1],this->commonNodes[i].NodeAttr.Position[2]-0.5*this->commonNodes[i].NodeAttr.Scale[2],this->commonNodes[i].NodeAttr.Scale[0],this->commonNodes[i].NodeAttr.Scale[1],this->commonNodes[i].NodeAttr.Scale[2],nxtPos[0],nxtPos[1],nxtPos[2]);
 		}
 		if(this->commonNodes[i].ifCollision(nxtPos)){
 			return true;

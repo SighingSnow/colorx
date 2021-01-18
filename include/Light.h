@@ -34,12 +34,13 @@ public:
     /* judge whether the light can be modified */
     bool isSelected;
 
-    inline Light():position(glm::vec3(0.0,0.0,0.0)),
+    inline Light():position(glm::vec3(1.2,1.0,3.0)),
     ambient(glm::vec3(1.0,1.0,1.0)),
     diffuse(glm::vec3(1.0,1.0,1.0)),
     specular(glm::vec3(1.0,1.0,1.0)),
     index(0),
-    isSelected(0)
+    isSelected(0),
+    strength(0.5)
     {
 
     }

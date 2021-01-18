@@ -23,9 +23,34 @@ void processInput(GLFWwindow *window)
 {
     void* data = glfwGetWindowUserPointer(window);
     EventHandler *eventer = static_cast<EventHandler*>(data);
+    if(glfwGetKey(window,GLFW_KEY_I) == GLFW_PRESS){
+        eventer->smgr->nodeLight->position += glm::vec3(0.0,0.2,0.0);
+    }
+    if(glfwGetKey(window,GLFW_KEY_J) == GLFW_PRESS){
+        eventer->smgr->nodeLight->position += glm::vec3(0.2,0.0,0.0);
+    }
+    if(glfwGetKey(window,GLFW_KEY_K) == GLFW_PRESS){
+        eventer->smgr->nodeLight->position -= glm::vec3(0.0,0.2,0.0);
+    }
+    if(glfwGetKey(window,GLFW_KEY_L) == GLFW_PRESS){
+        eventer->smgr->nodeLight->position -= glm::vec3(0.2,0.0,0.0);
+    }
+    if(glfwGetKey(window,GLFW_KEY_N) == GLFW_PRESS){
+        eventer->smgr->nodeLight->position -= glm::vec3(0.0,0.0,0.2);
+    }
+    if(glfwGetKey(window,GLFW_KEY_M) == GLFW_PRESS){
+        eventer->smgr->nodeLight->position += glm::vec3(0.0,0.0,0.2);
+        
+    }
     if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
     {      
         eventer->smgr->camera->ChangeGOD();
+    }
+    if(glfwGetKey(window,GLFW_KEY_MINUS) == GLFW_PRESS){
+        eventer->smgr->nodeLight->strength -= 0.02;
+    }
+    if(glfwGetKey(window,GLFW_KEY_EQUAL) == GLFW_PRESS){
+        eventer->smgr->nodeLight->strength += 0.02;
     }
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {      
@@ -172,6 +197,11 @@ void mouse_button_callback(GLFWwindow* window,int button, int action, int mods)
         faceNorm = cross(e1,e2);
         
         faceNorm = glm::normalize(faceNorm);
+        // for(int i = 0; i < 3;i++){
+        //     if(faceNorm[i] < 0.5) faceNorm[i] = 0;
+        //     else faceNorm[i] = 1;
+        // }
+        //std::cout<<faceNorm[0]<<' '<<faceNorm[1]<<' '<<faceNorm[2]<<std::endl;
         glm::vec3 camDir = eventer->smgr->camera->getDirection();
         glm::vec3 camPos = eventer->smgr->camera->getPostion();
         if(dot(faceNorm,camDir) > 0) faceNorm = -faceNorm;

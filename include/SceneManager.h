@@ -16,6 +16,7 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <ctime>
 
@@ -282,8 +283,8 @@ public:
 	Shader* crossShader;
 	Cross ourCross;
 	Skybox ourSkybox;
+	Light* nodeLight;
 	std::vector<Model> meshNodes;
-	std::vector<Light> lights;
 	std::vector<SceneNode> commonNodes;
 
 	bool wire = false;
@@ -311,6 +312,7 @@ public:
 		skyboxTex = loadCubemap(Faces);
 		ourSkybox = *new Skybox(skyboxTex);
 		ourCross = *new Cross();
+		nodeLight = new Light();
 		glfwGetWindowSize(window, &wWidth, &wHeight);
 	};
 

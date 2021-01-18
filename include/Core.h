@@ -54,7 +54,7 @@ static const char *nodeFShader = "#version 330 core\n"
 
 	"uniform bool EnableTexture;\n"
 	"uniform sampler2D Texture;\n"
-
+    "uniform float ambientStrength;\n"
     "uniform vec3 lightPos; \n"
     "uniform vec3 viewPos; \n"
     "uniform vec3 lightColor;\n"
@@ -62,7 +62,6 @@ static const char *nodeFShader = "#version 330 core\n"
     "void main()\n"
     "{\n"
         // ambient
-        "float ambientStrength = 0.5;\n"
         "vec3 ambient = ambientStrength * lightColor;\n"
         
         // diffuse 
