@@ -31,6 +31,7 @@ public:
 
 
     vector<Texture>     texturesLoaded;           //textures data
+    vector<Material>    materialsLoaded;
     std::vector<Mesh> meshes;               //meshes
 
     std::string directory;                  //model directory

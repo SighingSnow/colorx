@@ -100,9 +100,11 @@ static const char *meshNodeFShader = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "in vec2 TexCoords;\n"
     "uniform sampler2D texture_diffuse1;\n"
+    "uniform bool hasTexture;\n"
+    "uniform vec3 diffuse;\n"
     "void main()\n"
     "{\n"
-    "   FragColor = texture(texture_diffuse1,TexCoords);\n"
+    "   FragColor = hasTexture ? texture(texture_diffuse1,TexCoords) : vec4(diffuse,1.0);\n"
     "}\n\0";
 
 static const char *skyboxVShader = "#version 330 core\n"

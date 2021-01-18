@@ -46,6 +46,13 @@ struct Vertex {
     glm::vec2 texCoord;
 };
 
+struct Material {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
+    string mtlName;
+};
 
 
 class Mesh {
@@ -60,15 +67,20 @@ public:
     vector<Vertex>       vertices;
     vector<unsigned int> indices;
     vector<Texture>      textures;
+    Material      material;
 
     unsigned int VAO;
 
     //constructor
-    Mesh(vector<Face> faces, vector<Texture> textures)
+    Mesh(vector<Face> faces, vector<Texture> textures, Material material)
     {
         this->faces=faces;
         //this->texIndices=texIndices;
         this->textures=textures;
+        this->material.ambient= material.ambient;
+        this->material.diffuse = material.diffuse;
+        this->material.specular = material.specular;
+        this->material.shininess = material.shininess;
     }
 
 
