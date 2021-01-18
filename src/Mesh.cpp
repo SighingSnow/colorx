@@ -44,33 +44,69 @@ void Mesh::Draw(Shader &shader)
     unsigned int specularNr = 1;
     unsigned int normalNr   = 1;
     unsigned int heightNr   = 1;
-    bool hasTexture = 1;
-    if (textures.size() == 0)
+    bool hasAmbient = 0;
+    bool hasDiffuse = 0;
+    bool hasSpecular = 0;
+    bool hasBump = 0;
+   /* if (textures.size() == 0)
     {
         hasTexture = 0;
     }
-    glUniform1i(glGetUniformLocation(shader.ID, "hasTexture"), hasTexture);
-    glUniform3f(glGetUniformLocation(shader.ID, "diffuse"), material.diffuse.x, material.diffuse.y, material.diffuse.z);
-    for(unsigned int i = 0; i < textures.size(); i++)
+    glUniform1i(glGetUniformLocation(shader.ID, "hasTexture"), hasTexture);*/
+    //glUniform3f(glGetUniformLocation(shader.ID, "objectColor"), material.diffuse.x, material.diffuse.y, material.diffuse.z);
+    
+    //set material data to shader
+    shader.setVec3("material.ambient",  material.ambient);
+    shader.setVec3("material.diffuse",  material.diffuse);
+    shader.setVec3("material.specular", material.specular);
+    shader.setFloat("material.shininess", 32.0f);
+    
+
+    for (unsigned int i = 0; i < textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-        // retrieve texture number (the N in diffuse_textureN)
-        string number;
-        string name = textures[i].type;
-        if(name == "texture_diffuse")
-            number = std::to_string(diffuseNr++);
-        else if(name == "texture_specular")
-            number = std::to_string(specularNr++); // transfer unsigned int to stream
-        else if(name == "texture_normal")
-            number = std::to_string(normalNr++); // transfer unsigned int to stream
-        else if(name == "texture_height")
-            number = std::to_string(heightNr++); // transfer unsigned int to stream
+        string type = textures[i].type;
+        if (type == "texture_diffuse")
+        {
+            glUniform1i(glGetUniformLocation(shader.ID, "mytex.diffuse"), i);
+            hasDiffuse = 1;
 
-        // now set the sampler to the correct texture unit
-        glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-        // and finally bind the texture
+        }
+        else if (type == "texture_specular")
+        {
+            glUniform1i(glGetUniformLocation(shader.ID, "mytex.specular"), i);
+            hasSpecular = 1;
+        }
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
+
+
+    //set bool flags
+    glUniform1i(glGetUniformLocation(shader.ID, "mytex.hasAmbient"), hasAmbient);
+    glUniform1i(glGetUniformLocation(shader.ID, "mytex.hasDiffuse"), hasDiffuse);
+    glUniform1i(glGetUniformLocation(shader.ID, "mytex.hasSpecular"), hasSpecular);
+    glUniform1i(glGetUniformLocation(shader.ID, "mytex.hasBump"), hasBump);
+
+    //for(unsigned int i = 0; i < textures.size(); i++)
+    //{
+    //    glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+    //    // retrieve texture number (the N in diffuse_textureN)
+    //    string number;
+    //    string name = textures[i].type;
+    //    if(name == "texture_diffuse")
+    //        number = std::to_string(diffuseNr++);
+    //    else if(name == "texture_specular")
+    //        number = std::to_string(specularNr++); // transfer unsigned int to stream
+    //    else if(name == "texture_normal")
+    //        number = std::to_string(normalNr++); // transfer unsigned int to stream
+    //    else if(name == "texture_height")
+    //        number = std::to_string(heightNr++); // transfer unsigned int to stream
+
+    //    // now set the sampler to the correct texture unit
+    //    glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+    //    // and finally bind the texture
+    //    glBindTexture(GL_TEXTURE_2D, textures[i].id);
+    //}
         
     // draw mesh
     glBindVertexArray(VAO);

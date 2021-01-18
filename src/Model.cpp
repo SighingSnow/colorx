@@ -511,6 +511,7 @@ void Model::CopyMeshData(void)
                 //get vertex data
                 vertex.verCoord=this->verCoords[vertexWithIndex1.verCoordIndex];
                 vertex.normal=this->normals[vertexWithIndex1.norIndex];
+                if(this->texCoords.size()>vertexWithIndex1.texCoordIndex)
                 vertex.texCoord=this->texCoords[vertexWithIndex1.texCoordIndex];
                 vertices.push_back(vertex);         //store vertex data
                 
@@ -530,6 +531,7 @@ void Model::CopyMeshData(void)
                 //get vertex data
                 vertex.verCoord=this->verCoords[vertexWithIndex2.verCoordIndex];
                 vertex.normal=this->normals[vertexWithIndex2.norIndex];
+                if(this->texCoords.size()>vertexWithIndex2.texCoordIndex)
                 vertex.texCoord=this->texCoords[vertexWithIndex2.texCoordIndex];
                 vertices.push_back(vertex);         //store vertex data
                 
@@ -549,6 +551,7 @@ void Model::CopyMeshData(void)
                 //get vertex data
                 vertex.verCoord=this->verCoords[vertexWithIndex3.verCoordIndex];
                 vertex.normal=this->normals[vertexWithIndex3.norIndex];
+                if(this->texCoords.size()>vertexWithIndex3.texCoordIndex)
                 vertex.texCoord=this->texCoords[vertexWithIndex3.texCoordIndex];
                 vertices.push_back(vertex);         //store vertex data
                 

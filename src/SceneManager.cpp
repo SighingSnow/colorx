@@ -87,6 +87,14 @@ void SceneManager::drawAll()
 
 	//Traversal meshNodes
 	meshShader->use();
+	//meshShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	meshShader->setVec3("light.ambient", 1.0f, 1.0f, 1.0f);
+	meshShader->setVec3("light.diffuse", 1.0f, 1.0f, 1.0f); // 将光照调暗了一些以搭配场景
+	meshShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+	meshShader->setVec3("light.position", nodeLight->position);
+	meshShader->setVec3("viewPos", camera->Position);
+
 	meshShader->setMat4("projection", projection);
 	meshShader->setMat4("view", view);
 	glm::mat4 model = glm::mat4(1.0);
