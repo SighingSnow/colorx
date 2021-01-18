@@ -4,6 +4,10 @@ bool focused = true;
 float lastX = SCR_WIDTH / 2;
 float lastY = SCR_HEIGHT / 2;
 
+glm::vec3 velocity = glm::vec3(0.0);        //垂直方向速度
+glm::vec3 gravity = glm::vec3(0.0,GravityAcceler,0.0);         //重力加速度
+glm::vec3 accelerUp =glm::vec3(0,0.5,0); 
+
 void EventHandler::getTransMat(const SceneNode snode,glm::mat4 & trans)
 {
     glm::mat4 model = glm::mat4(1.0f);
@@ -68,11 +72,15 @@ void processInput(GLFWwindow *window)
         }
     }
     if(glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_PRESS){
+        velocity = glm::vec3(0.f, JumpInitialSpeed, 0.f);
+	    accelerUp.y = 0.f;
+        /*
         float temp = eventer->deltaTime;
         glm::vec3 nxtPos = eventer->smgr->camera->ProcessKeyboard(UP,temp);
         if(eventer->smgr->ifCollision(nxtPos)){
             eventer->smgr->camera->ProcessKeyboard(DOWN,temp);
         }
+        */
     }
     if(glfwGetKey(window,GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS){
         float temp = eventer->deltaTime;
@@ -87,6 +95,16 @@ void processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS){
 		eventer->smgr->wire = !eventer->smgr->wire;
 	}
+    if(velocity[1]==-JumpInitialSpeed){
+        accelerUp[1] = 0.5f;
+    }
+    glm::vec3 acceleration = gravity + accelerUp;
+    velocity += acceleration * GravityFactor;
+    eventer->smgr->camera->Position+=velocity * JumpFactor;
+    if(eventer->smgr->ifCollision(eventer->smgr->camera->Position)){
+            accelerUp[1] = 0.5f;
+            eventer->smgr->camera->Position-=velocity * JumpFactor;
+    }
     return;
 }
 

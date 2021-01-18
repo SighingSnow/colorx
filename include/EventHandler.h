@@ -9,6 +9,14 @@ extern bool firstMouse;
 extern float lastX;
 extern float lastY;
 
+#define GravityAcceler -0.5f
+#define JumpInitialSpeed 0.12f
+#define JumpFactor 0.004f          //跳起速度系数
+#define GravityFactor 0.004f       //下落速度系数
+
+extern glm::vec3 velocity;        //垂直方向速度
+extern glm::vec3 gravity;         //重力加速度
+extern glm::vec3 accelerUp; 
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
