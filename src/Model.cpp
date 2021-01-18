@@ -14,7 +14,17 @@
 
 //render the model
 void Model::Draw(Shader &shader)
-{
+{   
+    glm::mat4 model = glm::mat4(1.0f);
+    /* Note if you change the model matrix here, the matrix in button_callback should also be modified. */
+    //model = glm::rotate(model, NodeAttr.RotAngle, NodeAttr.RotAxis);
+    model = glm::translate(model, this->position * glm::vec3(Minier));
+    model = glm::scale(model, this->scale);
+
+    shader.setMat4("model", model);
+    //shader.setVec3("objectColor", NodeAttr.Color);
+
+
     //loops over each of the meshes to call their respective Draw function
     for(unsigned int i=0;i<meshes.size();i++)
         meshes[i].Draw(shader);

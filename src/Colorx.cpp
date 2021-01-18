@@ -198,11 +198,34 @@ void Colorx::initScene()
 	transform.Color = glm::vec3(1.0);
 	smgr->addCubeNode(transform, true, smgr->WoodTex);
 	
+	glm::vec3 position;
+	glm::vec3 scale;
+	position = glm::vec3(-20, -10, -20);
+	scale = glm::vec3(0.2, 0.2, 0.2);
 	#ifndef __APPLE__
-	smgr->addMeshSceneNode("../resource/nanosuit/nanosuit.obj");
+	smgr->addMeshSceneNode("../resource/nanosuit/nanosuit.obj",position,scale);
 	#else
-	smgr->addMeshSceneNode("resource/nanosuit/nanosuit.obj");
+	smgr->addMeshSceneNode("resource/nanosuit/nanosuit.obj",position,scale);
 	#endif
+
+
+	position = glm::vec3(0, -10, -20);
+	scale = glm::vec3(0.3, 0.3, 0.3);
+	#ifndef __APPLE__
+	smgr->addMeshSceneNode("../resource/Tails/Tails.obj",position,scale);
+	#else
+	smgr->addMeshSceneNode("resource/Tails/Tails.obj",position,scale);
+	#endif
+
+
+	position = glm::vec3(20, 10, -20);
+	scale = glm::vec3(0.02, 0.02, 0.02);
+	#ifndef __APPLE__
+	smgr->addMeshSceneNode("../resource/gipsy/gipsy.obj",position,scale);
+	#else
+	smgr->addMeshSceneNode("resource/gipsy/gipsy.obj",position,scale);
+	#endif
+
 }
 
 void Colorx::run()

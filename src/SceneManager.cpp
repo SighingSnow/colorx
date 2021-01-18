@@ -11,9 +11,9 @@
 /*	Class SceneNode's constructor and draw(Shader &shader) function
  */
 /* This is just a test */
-void SceneManager::addMeshSceneNode(const char* path)
+void SceneManager::addMeshSceneNode(const char* path,glm::vec3 position,glm::vec3 scale)
 {
-	Model ourModel(path);
+	Model ourModel(path,position,scale);
 	meshNodes.push_back(ourModel);
 }
 
@@ -70,7 +70,7 @@ void SceneManager::drawAll()
 	//Traversal commonNodes
 	commonShader->use();
 	
-	commonShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	commonShader->setVec3("lightColor", 1.0,1.0,1.0);
 	commonShader->setVec3("lightPos", nodeLight->position);
 	commonShader->setVec3("viewPos", camera->Position);
 	commonShader->setFloat("ambientStrength",nodeLight->strength);
@@ -91,7 +91,7 @@ void SceneManager::drawAll()
 	meshShader->setVec3("light.ambient", 1.0f, 1.0f, 1.0f);
 	meshShader->setVec3("light.diffuse", 1.0f, 1.0f, 1.0f); // 将光照调暗了一些以搭配场景
 	meshShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
+	meshShader->setFloat("ambientStrength",nodeLight->strength);
 	meshShader->setVec3("light.position", nodeLight->position);
 	meshShader->setVec3("viewPos", camera->Position);
 
