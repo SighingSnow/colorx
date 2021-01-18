@@ -316,7 +316,7 @@ public:
 		glfwGetWindowSize(window, &wWidth, &wHeight);
 	};
 
-	void addMeshSceneNode(const char* path );
+	void addMeshSceneNode(const char* path ,glm::vec3 position, glm::vec3 scale);
 
 	void addCubeNode(bool Texture = false, unsigned int TextureID = 0);
 	void addCubeNode(transAttr transform, bool Texture = false, unsigned int TextureID = 0);

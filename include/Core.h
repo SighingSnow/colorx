@@ -54,7 +54,7 @@ static const char *nodeFShader = "#version 330 core\n"
 
 	"uniform bool EnableTexture;\n"
 	"uniform sampler2D Texture;\n"
-
+    "uniform float ambientStrength;\n"
     "uniform vec3 lightPos; \n"
     "uniform vec3 viewPos; \n"
     "uniform vec3 lightColor;\n"
@@ -62,7 +62,7 @@ static const char *nodeFShader = "#version 330 core\n"
     "void main()\n"
     "{\n"
         // ambient
-        "float ambientStrength = 0.5;\n"
+        //"float ambientStrength = 0.5;\n"
         "vec3 ambient = ambientStrength * lightColor;\n"
         
         // diffuse 
@@ -109,7 +109,9 @@ static const char *meshNodeFShader =  "#version 330 core\n"
     "in vec3 Normal;  \n"
     "in vec3 FragPos;  \n"
     "in vec2 TexCoords;\n"
-    
+
+
+    "uniform float ambientStrength;\n"
     //"uniform bool hasTexture;\n"
     //"uniform vec3 objectColor;\n"
 
@@ -155,7 +157,7 @@ static const char *meshNodeFShader =  "#version 330 core\n"
         // ambient
         //"float ambientStrength = 0.5;\n"
         //"vec3 ambient =  light.ambient * material.ambient + vec3(0.5);\n"
-        "vec3 ambient = mytex.hasDiffuse ? (light.ambient * material.ambient * vec3(texture(mytex.diffuse, TexCoords))) : (light.ambient * material.ambient);\n"
+        "vec3 ambient = mytex.hasDiffuse ? (ambientStrength * light.ambient * material.ambient * vec3(texture(mytex.diffuse, TexCoords))) : (ambientStrength * light.ambient * material.ambient);\n"
         // diffuse 
         "vec3 norm = normalize(Normal);\n"
         "vec3 lightDir = normalize(light.position - FragPos);\n"

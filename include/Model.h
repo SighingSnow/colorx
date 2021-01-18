@@ -39,11 +39,16 @@ public:
 
     Shader* shader;
 
+    glm::vec3 position;
+    glm::vec3 scale;
+
     //constructor
-    Model(const std::string path){
+    Model(const std::string path,glm::vec3 position, glm::vec3 scale){
         //printf("In Model constructor\n");
         modelName=path.substr(path.rfind('/')+1);
         directory=path.substr(0,path.rfind('/'));
+        this->position = position;
+        this->scale = scale;
         loadModel(path);
         CopyMeshData();
     }
