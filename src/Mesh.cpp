@@ -44,6 +44,13 @@ void Mesh::Draw(Shader &shader)
     unsigned int specularNr = 1;
     unsigned int normalNr   = 1;
     unsigned int heightNr   = 1;
+    bool hasTexture = 1;
+    if (textures.size() == 0)
+    {
+        hasTexture = 0;
+    }
+    glUniform1i(glGetUniformLocation(shader.ID, "hasTexture"), hasTexture);
+    glUniform3f(glGetUniformLocation(shader.ID, "diffuse"), material.diffuse.x, material.diffuse.y, material.diffuse.z);
     for(unsigned int i = 0; i < textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding

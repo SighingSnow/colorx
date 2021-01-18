@@ -28,6 +28,7 @@ void Model::loadModel(std::string modelPath)
     std::string line;
     vector<Face>   faces;
     vector<Texture> textures;
+    Material material;
     //Mesh *mesh=(Mesh *)malloc(sizeof(Mesh));
     bool hasTexture=false;                       //if the model contains texture coordinates
     bool hasNormal=false;                        //if the model contains normal data
@@ -173,7 +174,7 @@ void Model::loadModel(std::string modelPath)
             //store last mesh
             if (!isFirstMesh)
             {
-                Mesh mesh(faces, textures);
+                Mesh mesh(faces, textures,material);
                 if (!hasNormal)
                     GenNormals(mesh);
                 this->meshes.push_back(mesh);       //store this mesh
@@ -197,6 +198,18 @@ void Model::loadModel(std::string modelPath)
                     textures.push_back(tex);        //store the texture index
                 }
             }
+            for (int i = 0; i < this->materialsLoaded.size(); i++)
+            {
+                Material mat = this->materialsLoaded[i];
+                if (mat.mtlName == mtlName)
+                {
+                    material.ambient= mat.ambient;
+                    material.diffuse = mat.diffuse;
+                    material.specular = mat.specular;
+                    material.shininess = mat.shininess;
+                    break;
+                }
+            }
         }
         else if(line[0]=='#')                   //comments
         {
@@ -208,7 +221,7 @@ void Model::loadModel(std::string modelPath)
 
     //read obj file ended
 
-    Mesh mesh(faces,textures);
+    Mesh mesh(faces,textures,material);
     if (!hasNormal)
         GenNormals(mesh);
     this->meshes.push_back(mesh); //store this mesh
@@ -288,9 +301,11 @@ void Model::GenNormals(Mesh &mesh)
 void Model::loadMaterial(string materialPath)
 {
     vector<Texture> texturesLoaded;
+    vector<Material> materialsLoaded;
     std::ifstream ifs(materialPath);
     std::string line;
     Texture tex;
+    Material mat;
     string mtlName;
     while(getline(ifs,line))
     {
@@ -382,6 +397,40 @@ void Model::loadMaterial(string materialPath)
             tex.mtlName=mtlName;
             texturesLoaded.push_back(tex);
         }
+        else if(ltype=="Ka")
+        {
+            float x,y,z;
+            s>>x;
+            s>>y;
+            s>>z;
+            mat.ambient.x=x;
+            mat.ambient.y=y;
+            mat.ambient.z=z;
+        }
+        else if(ltype=="Kd")
+        {
+            float x,y,z;
+            s>>x;
+            s>>y;
+            s>>z;
+            mat.diffuse.x=x;
+            mat.diffuse.y=y;
+            mat.diffuse.z=z;
+        }
+        else if(ltype=="Ks")
+        {
+            float x,y,z;
+            s>>x;
+            s>>y;
+            s>>z;
+            mat.specular.x=x;
+            mat.specular.y=y;
+            mat.specular.z=z;
+
+            mat.mtlName=mtlName;
+            materialsLoaded.push_back(mat);
+        }
+        
         else if(line[0]=='#')                   //comment line
         {
 
@@ -389,6 +438,7 @@ void Model::loadMaterial(string materialPath)
     }
 
     this->texturesLoaded=texturesLoaded;
+    this->materialsLoaded=materialsLoaded;
 }
 
 
