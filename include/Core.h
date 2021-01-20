@@ -110,15 +110,9 @@ static const char *meshNodeFShader =  "#version 330 core\n"
     "in vec3 FragPos;  \n"
     "in vec2 TexCoords;\n"
 
-
     "uniform float ambientStrength;\n"
-    //"uniform bool hasTexture;\n"
-    //"uniform vec3 objectColor;\n"
-
-    //"uniform vec3 lightPos; \n"
     "uniform vec3 viewPos; \n"
-    //"uniform vec3 lightColor;\n"
-
+    
     //material data
     "struct Material {\n"
     "vec3 ambient;\n"
@@ -155,8 +149,6 @@ static const char *meshNodeFShader =  "#version 330 core\n"
     "void main()\n"
     "{\n"
         // ambient
-        //"float ambientStrength = 0.5;\n"
-        //"vec3 ambient =  light.ambient * material.ambient + vec3(0.5);\n"
         "vec3 ambient = mytex.hasDiffuse ? (ambientStrength * light.ambient * material.ambient * vec3(texture(mytex.diffuse, TexCoords))) : (ambientStrength * light.ambient * material.ambient);\n"
         // diffuse 
         "vec3 norm = normalize(Normal);\n"
@@ -165,14 +157,13 @@ static const char *meshNodeFShader =  "#version 330 core\n"
         "vec3 diffuse = mytex.hasDiffuse ? (light.diffuse * (diff * material.diffuse) * vec3(texture(mytex.diffuse, TexCoords))) : (light.diffuse * (diff * material.diffuse));\n"
 
         // specular
-        //"float specularStrength = 0.3;\n"
         "vec3 viewDir = normalize(viewPos - FragPos);\n"
         "vec3 reflectDir = reflect(-lightDir, norm);  \n"
         "float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);\n"
         "vec3 specular = mytex.hasSpecular ? (light.specular * (spec * material.specular) * vec3(texture(mytex.specular, TexCoords))) : (light.specular * (spec * material.specular));\n"
 
+        //add three factors
         "vec3 Result = ambient + diffuse + specular;\n"
-        //"vec4 TexResult = hasTexture ? texture(texture_diffuse1, TexCoords) : vec4(1.0);\n"
 
         "FragColor = vec4(Result, 1.0);\n"
     "}\n\0";
