@@ -14,12 +14,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-//#include <assimp/Importer.hpp>
-//#include <assimp/scene.h>
-//#include <assimp/postprocess.h>
 #include "Mesh.h"
 
 
+//a model loaded from .obj file and the corresponding .mtl file
 class Model
 {   
 
@@ -30,21 +28,20 @@ public:
     vector<glm::vec3>   normals;            //normal data
 
 
-    vector<Texture>     texturesLoaded;           //textures data
-    vector<Material>    materialsLoaded;
+    vector<Texture>     texturesLoaded;     //textures data
+    vector<Material>    materialsLoaded;    //material data
     std::vector<Mesh> meshes;               //meshes
 
     std::string directory;                  //model directory
     std::string modelName;                  //model name
 
-    Shader* shader;
+    Shader* shader;                         //shader
 
     glm::vec3 position;
     glm::vec3 scale;
 
     //constructor
     Model(const std::string path,glm::vec3 position, glm::vec3 scale){
-        //printf("In Model constructor\n");
         modelName=path.substr(path.rfind('/')+1);
         directory=path.substr(0,path.rfind('/'));
         this->position = position;
@@ -52,16 +49,16 @@ public:
         loadModel(path);
         CopyMeshData();
     }
-    void Draw(Shader &shader);
+    
+    void Draw(Shader &shader);                  //render the model
     
 private:
 
-
-    void loadModel(std::string modelPath);
-    void GenNormals(Mesh &mesh);
-    void loadMaterial(string materialPath);
-    GLuint TextureFromFile(string textureName, string directory);
-    void CopyMeshData(void);
+    void loadModel(std::string modelPath);                          //load a model from a .obj file
+    void GenNormals(Mesh &mesh);                                    //generate normals for each vertex of the mesh
+    void loadMaterial(string materialPath);                         //load material from .mtl file                      
+    GLuint TextureFromFile(string textureName, string directory);   //load a texture from file
+    void CopyMeshData(void);                                        //copy data to each mesh after loading the .obj file
 
 };
 
