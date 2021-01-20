@@ -39,10 +39,9 @@ void Model::loadModel(std::string modelPath)
     vector<Face>   faces;
     vector<Texture> textures;
     Material material;
-    //Mesh *mesh=(Mesh *)malloc(sizeof(Mesh));
     bool hasTexture=false;                       //if the model contains texture coordinates
     bool hasNormal=false;                        //if the model contains normal data
-    bool isFirstMesh=true;
+    bool isFirstMesh=true;                       //if the mesh is the first mesh processed
     while(getline(ifs,line))
     {
         if(line.substr(0,6)=="mtllib")              //declaration of reference material library
@@ -185,7 +184,8 @@ void Model::loadModel(std::string modelPath)
             if (!isFirstMesh)
             {
                 Mesh mesh(faces, textures,material);
-                if (!hasNormal)
+                //if the .obj file doesn't contain normal information of this mesh
+                if (!hasNormal)                 
                     GenNormals(mesh);
                 this->meshes.push_back(mesh);       //store this mesh
                 faces.clear();
@@ -230,7 +230,7 @@ void Model::loadModel(std::string modelPath)
 
 
     //read obj file ended
-
+    //if the .obj file doesn't contain normal information of this mesh
     Mesh mesh(faces,textures,material);
     if (!hasNormal)
         GenNormals(mesh);
@@ -247,7 +247,7 @@ void Model::loadModel(std::string modelPath)
 }
 
 
-//generate normal for each vertex of the mesh
+//generate normals for each vertex of the mesh(if the mesh doesn't have normals)
 void Model::GenNormals(Mesh &mesh)
 {
     GLuint *map = (GLuint *)malloc(sizeof(GLuint) * (this->verCoords.size())); //map from vertex index to normal index
@@ -494,6 +494,7 @@ GLuint Model::TextureFromFile(string textureName, string directory)
 }
 
 
+//copy data to each mesh after loading the .obj file
 void Model::CopyMeshData(void)
 {
     GLuint* map = (GLuint*)malloc(sizeof(GLuint) * (this->verCoords.size()));
@@ -581,14 +582,15 @@ void Model::CopyMeshData(void)
 
         this->meshes[i].SetupMesh();
         
+        this->meshes[i].faces.clear();          //faces vector no longer needed
     }
 
     this->verCoords.clear();
     this->normals.clear();
     this->texCoords.clear();
+    this->materialsLoaded.clear();
+    this->texturesLoaded.clear();
     delete[] map;
-
-
 
 }
 

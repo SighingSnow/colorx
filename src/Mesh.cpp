@@ -38,12 +38,15 @@ void Mesh::SetupMesh(void)
     glBindVertexArray(0);
 }
 
+//render the mesh
 void Mesh::Draw(Shader &shader)
 {
-    unsigned int diffuseNr  = 1;
-    unsigned int specularNr = 1;
-    unsigned int normalNr   = 1;
-    unsigned int heightNr   = 1;
+    // unsigned int diffuseNr  = 1;
+    // unsigned int specularNr = 1;
+    // unsigned int normalNr   = 1;
+    // unsigned int heightNr   = 1;
+
+    //flag of specific texture type 
     bool hasAmbient = 0;
     bool hasDiffuse = 0;
     bool hasSpecular = 0;
@@ -61,7 +64,7 @@ void Mesh::Draw(Shader &shader)
     shader.setVec3("material.specular", material.specular);
     shader.setFloat("material.shininess", 32.0f);
     
-
+    //set texture data to shader
     for (unsigned int i = 0; i < textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
