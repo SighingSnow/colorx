@@ -36,6 +36,9 @@ public:
 
     float deltaTime;	// time between current frame and last frame
     float lastFrame;
+    int targetObject;
+    bool createMode;
+    bool selectMode;
 
     inline EventHandler(SceneManager* sengr){
         smgr = sengr;
@@ -46,9 +49,12 @@ public:
         glfwSetScrollCallback(smgr->window,scroll_callback);
         glfwSetFramebufferSizeCallback(smgr->window,framebuffer_size_callback);
         glfwSetMouseButtonCallback(smgr->window,mouse_button_callback);
+        createMode = false;
+        selectMode = true;
     }
 
     void getTransMat(const SceneNode snode,glm::mat4 & trans);
+
 };
 
 #endif

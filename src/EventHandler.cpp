@@ -23,6 +23,46 @@ void processInput(GLFWwindow *window)
 {
     void* data = glfwGetWindowUserPointer(window);
     EventHandler *eventer = static_cast<EventHandler*>(data);
+    if(glfwGetKey(window,GLFW_KEY_Z) == GLFW_PRESS){
+        eventer->selectMode = !eventer->selectMode;
+        eventer->createMode = !eventer->createMode;
+    }
+    if(eventer->selectMode){
+        if(glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.Position += glm::vec3(0,0.0,0.2);
+        }   
+        if(glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.Position -= glm::vec3(0,0.0,0.2);
+        }
+        if(glfwGetKey(window,GLFW_KEY_LEFT) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.Position -= glm::vec3(0.2,0.0,0.0);
+        }
+        if(glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.Position += glm::vec3(0.2,0.0,0.0);
+        }
+        if(glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.Position += glm::vec3(0.0,+0.2,0.0);
+        }
+        if(glfwGetKey(window,GLFW_KEY_V) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.Position -= glm::vec3(0.0,0.2,0.0);
+        }
+        if(glfwGetKey(window,GLFW_KEY_1) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.Scale *= glm::vec3(0.95);
+        }
+        if(glfwGetKey(window,GLFW_KEY_2) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.Scale *= glm::vec3(1.05);
+        }
+        if(glfwGetKey(window,GLFW_KEY_3) == GLFW_PRESS){
+            eventer->smgr->commonNodes[eventer->targetObject].NodeAttr.RotAngle += glm::radians(10.0);
+        }
+        if(glfwGetKey(window,GLFW_KEY_4) == GLFW_PRESS){
+             eventer->smgr->commonNodes[eventer->targetObject].textureID= 1;
+        }
+        if(glfwGetKey(window,GLFW_KEY_5) == GLFW_PRESS){
+                 eventer->smgr->commonNodes[eventer->targetObject].textureID= 4;
+        }
+    }
+
     if(glfwGetKey(window,GLFW_KEY_I) == GLFW_PRESS){
         eventer->smgr->nodeLight->position += glm::vec3(0.0,0.2,0.0);
     }
@@ -170,7 +210,7 @@ void mouse_button_callback(GLFWwindow* window,int button, int action, int mods)
         std::vector<SceneNode> tmpCNodes = eventer->smgr->commonNodes;
         for(int i = 0;i < tmpCNodes.size();i++){
             eventer->getTransMat(tmpCNodes[i],trans);
-            if(tmpCNodes[i].type == _CUBE_ && tmpCNodes[i].NodeAttr.pick == isPickable && tmpCNodes[i].NodeAttr.isAlive){
+            if(tmpCNodes[i].NodeAttr.pick == isPickable && tmpCNodes[i].NodeAttr.isAlive){
                 eventer->getTransMat(tmpCNodes[i],trans);
                 for(int j = 0;j < tmpCNodes[i].indices.size();j+=3){
                     int tmpIndices = tmpCNodes[i].indices[j];
@@ -222,10 +262,16 @@ void mouse_button_callback(GLFWwindow* window,int button, int action, int mods)
 		tTex = eventer->smgr->commonNodes[target].texture;
 		tTexID = eventer->smgr->commonNodes[target].textureID;
         if(target != -1){
-            //std::cout<<"[ORIGIN]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
-            tAttr.Position +=  faceNorm;
+            if(eventer->selectMode){
+                eventer->targetObject = target;
+            }
+            else if(eventer->createMode){
+                tAttr.Position +=  faceNorm;
+                eventer->smgr->addCubeNode(tAttr,tTex,tTexID);
+            }
+            
             //std::cout<<"[RESULT]"<<tAttr.Position[0]<<":"<<tAttr.Position[1]<<":"<<tAttr.Position[2]<<std::endl;
-            eventer->smgr->addCubeNode(tAttr,tTex,tTexID);
+            
         }
         
     }
